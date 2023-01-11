@@ -12,113 +12,111 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.ar.core.codelab.common.helpers;
+package com.google.ar.core.codelab.common.helpers
 
-import android.app.Activity;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
-import android.view.View;
-import android.widget.TextView;
+import android.app.Activity
+import android.util.Log
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
+import com.google.ar.core.codelab.common.Settings
+import com.google.ar.core.codelab.common.tag
+import com.google.ar.core.codelab.ui.model.SnackBarInfo
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 /**
  * Helper to manage the sample snackbar. Hides the Android boilerplate code, and exposes simpler
  * methods.
  */
-public final class SnackbarHelper {
-  private static final int BACKGROUND_COLOR = 0xbf323232;
-  private Snackbar messageSnackbar;
-  private enum DismissBehavior { HIDE, SHOW, FINISH };
-  private int maxLines = 2;
-  private String lastMessage = "";
+object SnackBarUseCase {
 
-  public boolean isShowing() {
-    return messageSnackbar != null;
-  }
+    private val mutableSnackBarFlow: MutableStateFlow<SnackBarInfo> = MutableStateFlow(SnackBarInfo.Hidden)
+    val snackBarFlow: Flow<SnackBarInfo> = mutableSnackBarFlow
 
-  /** Shows a snackbar with a given message. */
-  public void showMessage(Activity activity, String message) {
-    if (!message.isEmpty() && (!isShowing() || !lastMessage.equals(message))) {
-      lastMessage = message;
-      show(activity, message, DismissBehavior.HIDE);
-    }
-  }
+    private var lastSnackBar: Snackbar? = null
 
-  /** Shows a snackbar with a given message, and a dismiss button. */
-  public void showMessageWithDismiss(Activity activity, String message) {
-    show(activity, message, DismissBehavior.SHOW);
-  }
+    private val coroutineScope = CoroutineScope(
+        Dispatchers.Default +
+            Job() +
+            CoroutineExceptionHandler { _, throwable -> Log.e(tag, throwable.toString()) }
+    )
 
-  /**
-   * Shows a snackbar with a given error message. When dismissed, will finish the activity. Useful
-   * for notifying errors, where no further interaction with the activity is possible.
-   */
-  public void showError(Activity activity, String errorMessage) {
-    show(activity, errorMessage, DismissBehavior.FINISH);
-  }
+    private var lastMessage = ""
 
-  /**
-   * Hides the currently showing snackbar, if there is one. Safe to call from any thread. Safe to
-   * call even if snackbar is not shown.
-   */
-  public void hide(Activity activity) {
-    if (!isShowing()) {
-      return;
-    }
-    lastMessage = "";
-    Snackbar messageSnackbarToHide = messageSnackbar;
-    messageSnackbar = null;
-    activity.runOnUiThread(
-        new Runnable() {
-          @Override
-          public void run() {
-            messageSnackbarToHide.dismiss();
-          }
-        });
-  }
-
-  public void setMaxLines(int lines) {
-    maxLines = lines;
-  }
-
-  private void show(
-      final Activity activity, final String message, final DismissBehavior dismissBehavior) {
-    activity.runOnUiThread(
-        new Runnable() {
-          @Override
-          public void run() {
-            messageSnackbar =
-                Snackbar.make(
-                    activity.findViewById(android.R.id.content),
-                    message,
-                    Snackbar.LENGTH_INDEFINITE);
-            messageSnackbar.getView().setBackgroundColor(BACKGROUND_COLOR);
-            if (dismissBehavior != DismissBehavior.HIDE) {
-              messageSnackbar.setAction(
-                  "Dismiss",
-                  new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                      messageSnackbar.dismiss();
-                    }
-                  });
-              if (dismissBehavior == DismissBehavior.FINISH) {
-                messageSnackbar.addCallback(
-                    new BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                      @Override
-                      public void onDismissed(Snackbar transientBottomBar, int event) {
-                        super.onDismissed(transientBottomBar, event);
-                        activity.finish();
-                      }
-                    });
-              }
+    /** Shows a snackbar with a given message.  */
+    fun showMessage(message: String) {
+        if (lastMessage != message) {
+            lastMessage = message
+            coroutineScope.launch {
+                mutableSnackBarFlow.emit(SnackBarInfo.SnackWithMessage(message))
             }
-            ((TextView)
-                    messageSnackbar
-                        .getView()
-                        .findViewById(com.google.android.material.R.id.snackbar_text))
-                .setMaxLines(maxLines);
-            messageSnackbar.show();
-          }
-        });
-  }
+        }
+    }
+
+    /** Shows a snackbar with a given message, and a dismiss button.  */
+    fun showMessageWithDismiss(message: String) {
+        coroutineScope.launch {
+            mutableSnackBarFlow.emit(SnackBarInfo.WarnSnack(message))
+        }
+    }
+
+    /**
+     * Shows a snackbar with a given error message. When dismissed, will finish the activity. Useful
+     * for notifying errors, where no further interaction with the activity is possible.
+     */
+    fun showError(errorMessage: String) {
+        coroutineScope.launch {
+            mutableSnackBarFlow.emit(SnackBarInfo.ErrorSnack(errorMessage))
+        }
+    }
+
+    /**
+     * Hides the currently showing snackbar, if there is one. Safe to call from any thread. Safe to
+     * call even if snackbar is not shown.
+     */
+    fun hide() {
+        lastMessage = ""
+        coroutineScope.launch {
+            mutableSnackBarFlow.emit(SnackBarInfo.Hidden)
+        }
+    }
+
+    fun Activity.showSnackBar(
+        snackBarInfo: SnackBarInfo,
+    ) {
+        if (snackBarInfo is SnackBarInfo.Hidden) {
+            lastSnackBar?.dismiss()
+            lastSnackBar = null
+        } else {
+            Snackbar.make(
+                findViewById(android.R.id.content),
+                snackBarInfo.message,
+                Snackbar.LENGTH_INDEFINITE
+            ).apply {
+                view.setBackgroundColor(Settings.snackBackgroundColor)
+                if (snackBarInfo is SnackBarInfo.DismissibleSnack) {
+                    setAction("Dismiss") {
+                        coroutineScope.launch {
+                            mutableSnackBarFlow.emit(SnackBarInfo.Hidden)
+                        }
+                    }
+                    if (snackBarInfo is SnackBarInfo.ErrorSnack) {
+                        addCallback(
+                            object : BaseTransientBottomBar.BaseCallback<Snackbar?>() {
+                                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                    super.onDismissed(transientBottomBar, event)
+                                    finish()
+                                }
+                            }
+                        )
+                    }
+                }
+            }.show()
+        }
+    }
 }

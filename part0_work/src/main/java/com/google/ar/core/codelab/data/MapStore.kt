@@ -4,8 +4,10 @@ import android.graphics.Path
 import android.util.Log
 import com.google.ar.core.codelab.common.Settings
 import com.google.ar.core.codelab.common.tag
+import com.google.ar.core.codelab.rawdepth.FloatsPerPoint
 import com.google.ar.core.codelab.ui.model.MapState
 import com.google.ar.core.codelab.ui.model.UpdateMapState
+import java.nio.FloatBuffer
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,26 @@ object MapStore {
                         )
                     }
                 }
+            )
+        }
+    }
+
+    fun updateMapState(points: FloatBuffer) {
+        coroutineScope.launch {
+            val pointsArray = points.array()
+            val updatedPath = mutableMapPointsState.value.path
+            for (i in pointsArray.indices step FloatsPerPoint) {
+                updatedPath.addCircle(
+                    pointsArray[i] * Settings.mapScale,     // X
+                    pointsArray[i + 2] * Settings.mapScale, // Z
+                    Settings.mapPointRadius,
+                    Path.Direction.CW,
+                )
+            }
+            mutableMapPointsState.emit(
+                MapState(
+                    path = updatedPath,
+                )
             )
         }
     }

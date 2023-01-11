@@ -16,7 +16,7 @@ class MapView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : View(context, attrs, defStyle) {
 
-    private lateinit var path: Path
+    var path: Path = Path()
 
     fun setMapState(mapState: MapState) {
         Log.d("HARDCODE", "setMapState")

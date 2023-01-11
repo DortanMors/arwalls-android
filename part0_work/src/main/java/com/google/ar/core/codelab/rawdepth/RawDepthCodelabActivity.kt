@@ -15,25 +15,22 @@
  */
 package com.google.ar.core.codelab.rawdepth
 
-import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.ArCoreApk.InstallStatus
 import com.google.ar.core.Config
 import com.google.ar.core.Session
-import com.google.ar.core.TrackingState
 import com.google.ar.core.codelab.common.helpers.CameraPermissionHelper
 import com.google.ar.core.codelab.common.helpers.DisplayRotationHelper
 import com.google.ar.core.codelab.common.helpers.FullScreenHelper
-import com.google.ar.core.codelab.common.helpers.SnackbarHelper
-import com.google.ar.core.codelab.common.helpers.TrackingStateHelper
-import com.google.ar.core.codelab.common.rendering.BackgroundRenderer
-import com.google.ar.core.codelab.common.rendering.DepthRenderer
-import com.google.ar.core.codelab.domain.FilterWallPointsUseCase
+import com.google.ar.core.codelab.common.helpers.SnackBarUseCase
+import com.google.ar.core.codelab.common.helpers.SnackBarUseCase.showSnackBar
+import com.google.ar.core.codelab.domain.OpenGLRendererUseCase
 import com.google.ar.core.codelab.rawdepth.databinding.ActivityMainBinding
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
@@ -41,40 +38,49 @@ import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
-import java.io.IOException
-import java.nio.FloatBuffer
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
+import kotlinx.coroutines.launch
 
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
  * ARCore Raw Depth API. The application will show 3D point-cloud data of the environment.
  */
-class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
+class RawDepthCodelabActivity : AppCompatActivity() {
     // Rendering. The Renderers are created here, and initialized when the GL surface is created.
     private lateinit var binding: ActivityMainBinding
     private lateinit var session: Session
     private var installRequested = false
-    private val messageSnackbarHelper = SnackbarHelper()
-    private var displayRotationHelper: DisplayRotationHelper? = null
-    private val backgroundRenderer = BackgroundRenderer()
-    private val depthRenderer = DepthRenderer()
+    private val snackBarUseCase = SnackBarUseCase
+    private lateinit var displayRotationHelper: DisplayRotationHelper
+    private lateinit var openGLRendererUseCase: OpenGLRendererUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         displayRotationHelper = DisplayRotationHelper( /*context=*/this)
+        openGLRendererUseCase = OpenGLRendererUseCase(
+            context = this@RawDepthCodelabActivity,
+            displayRotationHelper = displayRotationHelper,
+        )
 
         // Set up renderer.
         binding.surfaceView.run {
             preserveEGLContextOnPause = true
             setEGLContextClientVersion(2)
             setEGLConfigChooser(8, 8, 8, 8, 16, 0) // Alpha used for plane blending.
-            setRenderer(this@RawDepthCodelabActivity)
+            setRenderer(openGLRendererUseCase)
             renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
             setWillNotDraw(false)
         }
         installRequested = false
+
+        lifecycleScope.launchWhenResumed {
+            lifecycleScope.launch {
+                snackBarUseCase.snackBarFlow.collect {
+                    showSnackBar(it)
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -123,8 +129,8 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
                 message = "Failed to create AR session"
                 exception = e
             }
-            if (message != null) {
-                messageSnackbarHelper.showError(this, message)
+            message?.let { errorMessage ->
+                snackBarUseCase.showError(errorMessage)
                 Log.e(TAG, "Exception creating session", exception)
                 return
             }
@@ -135,27 +141,27 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
                     config.apply {
                         depthMode = Config.DepthMode.RAW_DEPTH_ONLY
                         focusMode = Config.FocusMode.AUTO
+                        updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
                     }
                 )
                 resume()
             }
         } catch (e: CameraNotAvailableException) {
-            messageSnackbarHelper.showError(this, "Camera not available. Try restarting the app.")
+            snackBarUseCase.showError("Camera not available. Try restarting the app.")
             return
         }
 
         // Note that order matters - see the note in onPause(), the reverse applies here.
         binding.surfaceView.onResume()
-        displayRotationHelper?.onResume()
-        messageSnackbarHelper.showMessage(this, "Waiting for depth data...")
+        displayRotationHelper.onResume()
+        snackBarUseCase.showMessage("Waiting for depth data...")
     }
 
     public override fun onPause() {
         super.onPause()
-        // Note that the order matters - GLSurfaceView is paused first so that it does not try
-        // to query the session. If Session is paused before GLSurfaceView, GLSurfaceView may
+        // If Session is paused before GLSurfaceView, GLSurfaceView may
         // still call session.update() and get a SessionPausedException.
-        displayRotationHelper?.onPause()
+        displayRotationHelper.onPause()
         binding.surfaceView.onPause()
         session.pause()
     }
@@ -178,64 +184,6 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus)
-    }
-
-    override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
-        GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f)
-
-        // Prepare the rendering objects. This involves reading shaders, so may throw an IOException.
-        try {
-            // Create the texture and pass it to ARCore session to be filled during update().
-            backgroundRenderer.createOnGlThread( /*context=*/this)
-            depthRenderer.createOnGlThread(context = this)
-        } catch (e: IOException) {
-            Log.e(TAG, "Failed to read an asset file", e)
-        }
-    }
-
-    override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
-        displayRotationHelper?.onSurfaceChanged(width, height)
-        GLES20.glViewport(0, 0, width, height)
-    }
-
-    override fun onDrawFrame(gl: GL10) {
-        // Clear screen to notify driver it should not load any pixels from previous frame.
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
-        // Notify ARCore session that the view size changed so that the perspective matrix and
-        // the video background can be properly adjusted.
-        displayRotationHelper?.updateSessionIfNeeded(session)
-        try {
-            session.setCameraTextureName(backgroundRenderer.textureId)
-
-            // Obtain the current frame from ARSession. When the configuration is set to
-            // UpdateMode.BLOCKING (it is by default), this will throttle the rendering to the
-            // camera framerate.
-            val frame = session.update()
-            val camera = frame.camera
-
-            // If frame is ready, render camera preview image to the GL surface.
-            backgroundRenderer.draw(frame)
-
-            // Retrieve the depth data for this frame.
-            val points: FloatBuffer = create(frame, session.createAnchor(camera.pose)) ?: return
-            FilterWallPointsUseCase.invoke(points)
-            depthRenderer.update(points)
-            depthRenderer.draw(camera)
-            if (messageSnackbarHelper.isShowing) {
-                messageSnackbarHelper.hide(this)
-            }
-
-            // If not tracking, show tracking failure reason instead.
-            if (camera.trackingState == TrackingState.PAUSED) {
-                messageSnackbarHelper.showMessage(
-                    this, TrackingStateHelper.getTrackingFailureReasonString(camera)
-                )
-                return
-            }
-        } catch (t: Throwable) {
-            // Avoid crashing the application due to unhandled exceptions.
-            Log.e(TAG, "Exception on the OpenGL thread", t)
-        }
     }
 
     companion object {

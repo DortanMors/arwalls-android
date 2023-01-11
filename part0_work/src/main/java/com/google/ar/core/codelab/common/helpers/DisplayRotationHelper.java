@@ -24,6 +24,9 @@ import android.hardware.display.DisplayManager.DisplayListener;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
+
+import androidx.annotation.NonNull;
+
 import com.google.ar.core.Session;
 
 /**
@@ -51,12 +54,12 @@ public final class DisplayRotationHelper implements DisplayListener {
     display = windowManager.getDefaultDisplay();
   }
 
-  /** Registers the display listener. Should be called from {@link Activity#onResume()}. */
+  /** Registers the display listener. Should be called from { Activity#onResume()}. */
   public void onResume() {
     displayManager.registerDisplayListener(this, null);
   }
 
-  /** Unregisters the display listener. Should be called from {@link Activity#onPause()}. */
+  /** Unregisters the display listener. Should be called from { Activity#onPause()}. */
   public void onPause() {
     displayManager.unregisterDisplayListener(this);
   }
@@ -84,7 +87,7 @@ public final class DisplayRotationHelper implements DisplayListener {
    *
    * @param session the {@link Session} object to update if display geometry changed.
    */
-  public void updateSessionIfNeeded(Session session) {
+  public void updateSessionIfNeeded(@NonNull Session session) {
     if (viewportChanged) {
       int displayRotation = display.getRotation();
       session.setDisplayGeometry(displayRotation, viewportWidth, viewportHeight);

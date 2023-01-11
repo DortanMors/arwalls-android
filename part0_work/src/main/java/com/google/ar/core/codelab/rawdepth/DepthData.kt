@@ -5,6 +5,7 @@ import android.opengl.Matrix
 import com.google.ar.core.Anchor
 import com.google.ar.core.CameraIntrinsics
 import com.google.ar.core.Frame
+import com.google.ar.core.codelab.common.Settings
 import com.google.ar.core.exceptions.NotYetAvailableException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -22,8 +23,6 @@ import kotlin.math.sqrt
 
 
 const val FloatsPerPoint = 4 // X, Y, Z, confidence
-const val MinConfidence = 0.3
-const val MaxNumberOfPointsToRender = 20000f
 
 
 fun create(frame: Frame, cameraPoseAnchor: Anchor): FloatBuffer? {
@@ -92,7 +91,7 @@ private fun convertRawDepthImagesTo3dPointBuffer(
     // Allocate the destination point buffer. If the number of depth pixels is larger than
     // `maxNumberOfPointsToRender` we uniformly subsample. The raw depth image may have
     // different resolutions on different devices.
-    val step = ceil(sqrt((depthWidth * depthHeight / MaxNumberOfPointsToRender).toDouble())).toInt()
+    val step = ceil(sqrt((depthWidth * depthHeight / Settings.maxNumberOfPointsToRender).toDouble())).toInt()
     val points = FloatBuffer.allocate(depthWidth / step * depthHeight / step * FloatsPerPoint)
     val pointCamera = FloatArray(4)
     val pointWorld = FloatArray(4)
@@ -117,7 +116,7 @@ private fun convertRawDepthImagesTo3dPointBuffer(
                     + x * confidenceImagePlane.pixelStride
             )
             val confidenceNormalized: Float = (confidencePixelValue and 0xff.toByte()).toFloat() / 255.0f
-            if (confidenceNormalized < MinConfidence) {
+            if (confidenceNormalized < Settings.minConfidence) {
                 // Ignores "low-confidence" pixels.
                 x += step
                 continue
