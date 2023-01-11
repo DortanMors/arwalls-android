@@ -23,6 +23,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.ArCoreApk.InstallStatus
+import com.google.ar.core.Config
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
 import com.google.ar.core.codelab.common.helpers.CameraPermissionHelper
@@ -96,7 +97,11 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
                 }
 
                 // Creates the ARCore session.
-                session = Session( /* context = */this)
+                session = Session( /* context = */this).also { newSession ->
+                    if (!newSession.isDepthModeSupported(Config.DepthMode.RAW_DEPTH_ONLY)) {
+                        message = "This device does not support the ARCore Raw Depth API. See https://developers.google.com/ar/devices for a list of devices that do."
+                    }
+                }
             } catch (e: UnavailableArcoreNotInstalledException) {
                 message = "Please install ARCore"
                 exception = e
@@ -123,7 +128,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             }
         }
         try {
-            session!!.resume()
+            session?.resume()
         } catch (e: CameraNotAvailableException) {
             messageSnackbarHelper.showError(this, "Camera not available. Try restarting the app.")
             session = null
@@ -131,8 +136,8 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         }
 
         // Note that order matters - see the note in onPause(), the reverse applies here.
-        surfaceView!!.onResume()
-        displayRotationHelper!!.onResume()
+        surfaceView?.onResume()
+        displayRotationHelper?.onResume()
         messageSnackbarHelper.showMessage(this, "Waiting for depth data...")
     }
 
@@ -142,9 +147,9 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             // Note that the order matters - GLSurfaceView is paused first so that it does not try
             // to query the session. If Session is paused before GLSurfaceView, GLSurfaceView may
             // still call session.update() and get a SessionPausedException.
-            displayRotationHelper!!.onPause()
-            surfaceView!!.onPause()
-            session!!.pause()
+            displayRotationHelper?.onPause()
+            surfaceView?.onPause()
+            session?.pause()
         }
     }
 
@@ -180,7 +185,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
-        displayRotationHelper!!.onSurfaceChanged(width, height)
+        displayRotationHelper?.onSurfaceChanged(width, height)
         GLES20.glViewport(0, 0, width, height)
     }
 
@@ -192,21 +197,23 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         }
         // Notify ARCore session that the view size changed so that the perspective matrix and
         // the video background can be properly adjusted.
-        displayRotationHelper!!.updateSessionIfNeeded(session)
+        displayRotationHelper?.updateSessionIfNeeded(session)
         try {
-            session!!.setCameraTextureName(backgroundRenderer.textureId)
+            session?.setCameraTextureName(backgroundRenderer.textureId)
 
             // Obtain the current frame from ARSession. When the configuration is set to
             // UpdateMode.BLOCKING (it is by default), this will throttle the rendering to the
             // camera framerate.
-            val frame = session!!.update()
-            val camera = frame.camera
+            val frame = session?.update()
+            val camera = frame?.camera
 
             // If frame is ready, render camera preview image to the GL surface.
-            backgroundRenderer.draw(frame)
+            if (frame != null) {
+                backgroundRenderer.draw(frame)
+            }
 
             // If not tracking, show tracking failure reason instead.
-            if (camera.trackingState == TrackingState.PAUSED) {
+            if (camera?.trackingState == TrackingState.PAUSED) {
                 messageSnackbarHelper.showMessage(
                     this, TrackingStateHelper.getTrackingFailureReasonString(camera)
                 )
