@@ -19,13 +19,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.google.ar.core.codelab.rawdepth.RawDepthCodelabActivity">
+    tools:context="com.google.ar.core.codelab.rawdepth.ru.google.ar.core.codelab.rawdepth.RawDepthCodelabActivity">
 
   <androidx.fragment.app.FragmentContainerView
       android:id="@+id/fragment_container"
       android:layout_width="0dp"
       android:layout_height="300dp"
-      android:name="com.google.ar.core.codelab.map.MapFragment"
+      android:name="ru.ssau.arwalls.map.MapFragment"
       app:layout_constraintTop_toTopOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"

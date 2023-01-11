@@ -33,7 +33,7 @@
       tools:ignore="GoogleAppIndexingWarning">
 
     <activity
-        android:name=".RawDepthCodelabActivity"
+        android:name="ru.ssau.arwalls.rawdepth.RawDepthCodelabActivity"
         android:configChanges="orientation|screenSize"
         android:exported="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"
