@@ -40,6 +40,7 @@ import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 import java.io.IOException
+import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -210,6 +211,15 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
 
             // If frame is ready, render camera preview image to the GL surface.
             backgroundRenderer.draw(frame)
+
+            // Retrieve the depth data for this frame.
+
+            // Retrieve the depth data for this frame.
+            val points: FloatBuffer = create(frame, session.createAnchor(camera.pose)) ?: return
+
+            if (messageSnackbarHelper.isShowing) {
+                messageSnackbarHelper.hide(this)
+            }
 
             // If not tracking, show tracking failure reason instead.
             if (camera.trackingState == TrackingState.PAUSED) {
