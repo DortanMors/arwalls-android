@@ -32,6 +32,7 @@ import com.google.ar.core.codelab.common.helpers.FullScreenHelper
 import com.google.ar.core.codelab.common.helpers.SnackbarHelper
 import com.google.ar.core.codelab.common.helpers.TrackingStateHelper
 import com.google.ar.core.codelab.common.rendering.BackgroundRenderer
+import com.google.ar.core.codelab.common.rendering.DepthRenderer
 import com.google.ar.core.codelab.rawdepth.databinding.ActivityMainBinding
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
@@ -56,6 +57,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     private val messageSnackbarHelper = SnackbarHelper()
     private var displayRotationHelper: DisplayRotationHelper? = null
     private val backgroundRenderer = BackgroundRenderer()
+    private val depthRenderer = DepthRenderer()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -184,6 +186,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         try {
             // Create the texture and pass it to ARCore session to be filled during update().
             backgroundRenderer.createOnGlThread( /*context=*/this)
+            depthRenderer.createOnGlThread(context = this)
         } catch (e: IOException) {
             Log.e(TAG, "Failed to read an asset file", e)
         }
@@ -213,10 +216,9 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             backgroundRenderer.draw(frame)
 
             // Retrieve the depth data for this frame.
-
-            // Retrieve the depth data for this frame.
             val points: FloatBuffer = create(frame, session.createAnchor(camera.pose)) ?: return
-
+            depthRenderer.update(points)
+            depthRenderer.draw(camera)
             if (messageSnackbarHelper.isShowing) {
                 messageSnackbarHelper.hide(this)
             }
