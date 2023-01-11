@@ -13,16 +13,32 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.google.ar.core.codelab.rawdepth.RawDepthCodelabActivity">
 
-  <android.opengl.GLSurfaceView
-      android:id="@+id/surfaceview"
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:layout_gravity="top"/>
+  <androidx.fragment.app.FragmentContainerView
+      android:id="@+id/fragment_container"
+      android:layout_width="0dp"
+      android:layout_height="300dp"
+      android:name="com.google.ar.core.codelab.map.MapFragment"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      tools:layout="@layout/fragment_map" />
 
-</RelativeLayout>
+  <android.opengl.GLSurfaceView
+      android:id="@+id/surface_view"
+      android:layout_width="0dp"
+      android:layout_height="0dp"
+      app:layout_constraintTop_toBottomOf="@id/fragment_container"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

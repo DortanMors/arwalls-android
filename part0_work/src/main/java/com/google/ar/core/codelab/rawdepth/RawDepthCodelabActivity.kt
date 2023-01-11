@@ -33,6 +33,7 @@ import com.google.ar.core.codelab.common.helpers.SnackbarHelper
 import com.google.ar.core.codelab.common.helpers.TrackingStateHelper
 import com.google.ar.core.codelab.common.rendering.BackgroundRenderer
 import com.google.ar.core.codelab.common.rendering.DepthRenderer
+import com.google.ar.core.codelab.domain.FilterWallPointsUseCase
 import com.google.ar.core.codelab.rawdepth.databinding.ActivityMainBinding
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
@@ -65,7 +66,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         displayRotationHelper = DisplayRotationHelper( /*context=*/this)
 
         // Set up renderer.
-        binding.surfaceview.run {
+        binding.surfaceView.run {
             preserveEGLContextOnPause = true
             setEGLContextClientVersion(2)
             setEGLConfigChooser(8, 8, 8, 8, 16, 0) // Alpha used for plane blending.
@@ -144,7 +145,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         }
 
         // Note that order matters - see the note in onPause(), the reverse applies here.
-        binding.surfaceview.onResume()
+        binding.surfaceView.onResume()
         displayRotationHelper?.onResume()
         messageSnackbarHelper.showMessage(this, "Waiting for depth data...")
     }
@@ -155,7 +156,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         // to query the session. If Session is paused before GLSurfaceView, GLSurfaceView may
         // still call session.update() and get a SessionPausedException.
         displayRotationHelper?.onPause()
-        binding.surfaceview.onPause()
+        binding.surfaceView.onPause()
         session.pause()
     }
 
@@ -217,6 +218,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
 
             // Retrieve the depth data for this frame.
             val points: FloatBuffer = create(frame, session.createAnchor(camera.pose)) ?: return
+            FilterWallPointsUseCase.invoke(points)
             depthRenderer.update(points)
             depthRenderer.draw(camera)
             if (messageSnackbarHelper.isShowing) {
