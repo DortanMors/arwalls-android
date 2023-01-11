@@ -50,9 +50,8 @@ import javax.microedition.khronos.opengles.GL10
 class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     // Rendering. The Renderers are created here, and initialized when the GL surface is created.
     private lateinit var binding: ActivityMainBinding
-    private var surfaceView: GLSurfaceView? = null
+    private lateinit var session: Session
     private var installRequested = false
-    private var session: Session? = null
     private val messageSnackbarHelper = SnackbarHelper()
     private var displayRotationHelper: DisplayRotationHelper? = null
     private val backgroundRenderer = BackgroundRenderer()
@@ -60,7 +59,6 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        surfaceView = findViewById(R.id.surfaceview)
         displayRotationHelper = DisplayRotationHelper( /*context=*/this)
 
         // Set up renderer.
@@ -77,7 +75,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
 
     override fun onResume() {
         super.onResume()
-        if (session == null) {
+        if (!::session.isInitialized) {
             var exception: Exception? = null
             var message: String? = null
             try {
@@ -128,7 +126,7 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             }
         }
         try {
-            session?.run {
+            session.run {
                 configure(
                     config.apply {
                         depthMode = Config.DepthMode.RAW_DEPTH_ONLY
@@ -139,26 +137,23 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             }
         } catch (e: CameraNotAvailableException) {
             messageSnackbarHelper.showError(this, "Camera not available. Try restarting the app.")
-            session = null
             return
         }
 
         // Note that order matters - see the note in onPause(), the reverse applies here.
-        surfaceView?.onResume()
+        binding.surfaceview.onResume()
         displayRotationHelper?.onResume()
         messageSnackbarHelper.showMessage(this, "Waiting for depth data...")
     }
 
     public override fun onPause() {
         super.onPause()
-        if (session != null) {
-            // Note that the order matters - GLSurfaceView is paused first so that it does not try
-            // to query the session. If Session is paused before GLSurfaceView, GLSurfaceView may
-            // still call session.update() and get a SessionPausedException.
-            displayRotationHelper?.onPause()
-            surfaceView?.onPause()
-            session?.pause()
-        }
+        // Note that the order matters - GLSurfaceView is paused first so that it does not try
+        // to query the session. If Session is paused before GLSurfaceView, GLSurfaceView may
+        // still call session.update() and get a SessionPausedException.
+        displayRotationHelper?.onPause()
+        binding.surfaceview.onPause()
+        session.pause()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, results: IntArray) {
@@ -201,28 +196,23 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
     override fun onDrawFrame(gl: GL10) {
         // Clear screen to notify driver it should not load any pixels from previous frame.
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
-        if (session == null) {
-            return
-        }
         // Notify ARCore session that the view size changed so that the perspective matrix and
         // the video background can be properly adjusted.
         displayRotationHelper?.updateSessionIfNeeded(session)
         try {
-            session?.setCameraTextureName(backgroundRenderer.textureId)
+            session.setCameraTextureName(backgroundRenderer.textureId)
 
             // Obtain the current frame from ARSession. When the configuration is set to
             // UpdateMode.BLOCKING (it is by default), this will throttle the rendering to the
             // camera framerate.
-            val frame = session?.update()
-            val camera = frame?.camera
+            val frame = session.update()
+            val camera = frame.camera
 
             // If frame is ready, render camera preview image to the GL surface.
-            if (frame != null) {
-                backgroundRenderer.draw(frame)
-            }
+            backgroundRenderer.draw(frame)
 
             // If not tracking, show tracking failure reason instead.
-            if (camera?.trackingState == TrackingState.PAUSED) {
+            if (camera.trackingState == TrackingState.PAUSED) {
                 messageSnackbarHelper.showMessage(
                     this, TrackingStateHelper.getTrackingFailureReasonString(camera)
                 )
