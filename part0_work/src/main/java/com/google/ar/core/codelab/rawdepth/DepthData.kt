@@ -22,6 +22,9 @@ import kotlin.math.sqrt
 
 
 const val FloatsPerPoint = 4 // X, Y, Z, confidence
+const val MinConfidence = 0.3
+const val MaxNumberOfPointsToRender = 20000f
+
 
 fun create(frame: Frame, cameraPoseAnchor: Anchor): FloatBuffer? {
     try {
@@ -34,7 +37,7 @@ fun create(frame: Frame, cameraPoseAnchor: Anchor): FloatBuffer? {
         // https://developers.google.com/ar/develop/java/depth/overview#understand-depth-values.
         val intrinsics: CameraIntrinsics = frame.camera.textureIntrinsics
         val modelMatrix = FloatArray(16)
-        cameraPoseAnchor.pose.toMatrix(modelMatrix, 0)
+        cameraPoseAnchor.pose.toMatrix(modelMatrix, 0) // задание системы координат
         val points: FloatBuffer = convertRawDepthImagesTo3dPointBuffer(
             depthImage, confidenceImage, intrinsics, modelMatrix
         )
@@ -89,8 +92,7 @@ private fun convertRawDepthImagesTo3dPointBuffer(
     // Allocate the destination point buffer. If the number of depth pixels is larger than
     // `maxNumberOfPointsToRender` we uniformly subsample. The raw depth image may have
     // different resolutions on different devices.
-    val maxNumberOfPointsToRender = 20000f
-    val step = ceil(sqrt((depthWidth * depthHeight / maxNumberOfPointsToRender).toDouble())).toInt()
+    val step = ceil(sqrt((depthWidth * depthHeight / MaxNumberOfPointsToRender).toDouble())).toInt()
     val points = FloatBuffer.allocate(depthWidth / step * depthHeight / step * FloatsPerPoint)
     val pointCamera = FloatArray(4)
     val pointWorld = FloatArray(4)
@@ -115,7 +117,11 @@ private fun convertRawDepthImagesTo3dPointBuffer(
                     + x * confidenceImagePlane.pixelStride
             )
             val confidenceNormalized: Float = (confidencePixelValue and 0xff.toByte()).toFloat() / 255.0f
-
+            if (confidenceNormalized < MinConfidence) {
+                // Ignores "low-confidence" pixels.
+                x += step
+                continue
+            }
             // Unproject the depth into a 3D point in camera coordinates.
             pointCamera[0] = depthMeters * (x - cx) / fx
             pointCamera[1] = depthMeters * (cy - y) / fy
