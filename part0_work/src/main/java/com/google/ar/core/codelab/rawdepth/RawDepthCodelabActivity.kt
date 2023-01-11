@@ -18,9 +18,9 @@ package com.google.ar.core.codelab.rawdepth
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.ArCoreApk.InstallStatus
 import com.google.ar.core.Config
@@ -128,7 +128,15 @@ class RawDepthCodelabActivity : AppCompatActivity(), GLSurfaceView.Renderer {
             }
         }
         try {
-            session?.resume()
+            session?.run {
+                configure(
+                    config.apply {
+                        depthMode = Config.DepthMode.RAW_DEPTH_ONLY
+                        focusMode = Config.FocusMode.AUTO
+                    }
+                )
+                resume()
+            }
         } catch (e: CameraNotAvailableException) {
             messageSnackbarHelper.showError(this, "Camera not available. Try restarting the app.")
             session = null
