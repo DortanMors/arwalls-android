@@ -16,12 +16,11 @@ class MapView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : View(context, attrs, defStyle) {
 
-    var path: Path = Path()
+    private var path: Path = Path()
 
     fun setMapState(mapState: MapState) {
         Log.d("HARDCODE", "setMapState")
         path = mapState.path
-        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
