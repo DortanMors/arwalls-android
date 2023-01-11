@@ -16,7 +16,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.google.ar.core.codelab.rawdepth">
+    package="ru.ssau.arwalls.rawdepth">
 
   <uses-permission android:name="android.permission.CAMERA"/>
   <!-- This tag indicates that this application requires ARCore.  This results in the application
@@ -33,7 +33,7 @@
       tools:ignore="GoogleAppIndexingWarning">
 
     <activity
-        android:name="ru.ssau.arwalls.rawdepth.RawDepthCodelabActivity"
+        android:name="ru.ssau.arwalls.rawdepth.MainActivity"
         android:configChanges="orientation|screenSize"
         android:exported="true"
         android:theme="@style/Theme.AppCompat.NoActionBar"

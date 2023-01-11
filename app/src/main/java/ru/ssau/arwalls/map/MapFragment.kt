@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.ar.core.codelab.rawdepth.databinding.FragmentMapBinding
+import ru.ssau.arwalls.rawdepth.databinding.FragmentMapBinding
 import kotlinx.coroutines.launch
 
 class MapFragment: Fragment() {

@@ -25,13 +25,13 @@ import com.google.ar.core.ArCoreApk
 import com.google.ar.core.ArCoreApk.InstallStatus
 import com.google.ar.core.Config
 import com.google.ar.core.Session
+import ru.ssau.arwalls.rawdepth.databinding.ActivityMainBinding
 import ru.ssau.arwalls.common.helpers.CameraPermissionHelper
 import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
 import ru.ssau.arwalls.common.helpers.FullScreenHelper
 import ru.ssau.arwalls.common.helpers.SnackBarUseCase
 import ru.ssau.arwalls.common.helpers.SnackBarUseCase.showSnackBar
 import ru.ssau.arwalls.domain.OpenGLRendererUseCase
-import com.google.ar.core.codelab.rawdepth.databinding.ActivityMainBinding
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException
@@ -39,12 +39,13 @@ import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 import kotlinx.coroutines.launch
+import ru.ssau.arwalls.common.tag
 
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
  * ARCore Raw Depth API. The application will show 3D point-cloud data of the environment.
  */
-class RawDepthCodelabActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
     // Rendering. The Renderers are created here, and initialized when the GL surface is created.
     private lateinit var binding: ActivityMainBinding
     private lateinit var session: Session
@@ -59,7 +60,7 @@ class RawDepthCodelabActivity : AppCompatActivity() {
         setContentView(binding.root)
         displayRotationHelper = DisplayRotationHelper( /*context=*/this)
         openGLRendererUseCase = OpenGLRendererUseCase(
-            context = this@RawDepthCodelabActivity,
+            context = this@MainActivity,
             displayRotationHelper = displayRotationHelper,
         )
 
@@ -131,7 +132,7 @@ class RawDepthCodelabActivity : AppCompatActivity() {
             }
             message?.let { errorMessage ->
                 snackBarUseCase.showError(errorMessage)
-                Log.e(TAG, "Exception creating session", exception)
+                Log.e(tag, "Exception creating session", exception)
                 return
             }
         }
@@ -184,9 +185,5 @@ class RawDepthCodelabActivity : AppCompatActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus)
-    }
-
-    companion object {
-        private val TAG = RawDepthCodelabActivity::class.java.simpleName
     }
 }

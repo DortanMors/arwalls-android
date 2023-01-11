@@ -14,7 +14,7 @@ def setVersionName = { ->
 android {
     compileSdkVersion 33
     defaultConfig {
-        applicationId "com.google.ar.core.codelab.rawdepth"
+        applicationId "ru.ssau.arwalls"
 
         // AR Optional apps must declare minSdkVersion >= 14.
         // AR Required apps must declare minSdkVersion >= 24.
