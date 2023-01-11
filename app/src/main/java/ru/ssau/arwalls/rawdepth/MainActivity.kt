@@ -48,7 +48,6 @@ import ru.ssau.arwalls.common.tag
 class MainActivity : AppCompatActivity() {
     // Rendering. The Renderers are created here, and initialized when the GL surface is created.
     private lateinit var binding: ActivityMainBinding
-    private lateinit var session: Session
     private var installRequested = false
     private val snackBarUseCase = SnackBarUseCase
     private lateinit var displayRotationHelper: DisplayRotationHelper
@@ -86,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!::session.isInitialized) {
+        if (openGLRendererUseCase.session == null) {
             var exception: Exception? = null
             var message: String? = null
             try {
@@ -106,7 +105,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // Creates the ARCore session.
-                session = Session( /* context = */this).also { newSession ->
+                openGLRendererUseCase.session = Session( /* context = */this).also { newSession ->
                     if (!newSession.isDepthModeSupported(Config.DepthMode.RAW_DEPTH_ONLY)) {
                         message = "This device does not support the ARCore Raw Depth API. See https://developers.google.com/ar/devices for a list of devices that do."
                     }
@@ -137,7 +136,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         try {
-            session.run {
+            openGLRendererUseCase.session?.run {
                 configure(
                     config.apply {
                         depthMode = Config.DepthMode.RAW_DEPTH_ONLY
@@ -164,7 +163,7 @@ class MainActivity : AppCompatActivity() {
         // still call session.update() and get a SessionPausedException.
         displayRotationHelper.onPause()
         binding.surfaceView.onPause()
-        session.pause()
+        openGLRendererUseCase.session?.pause()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, results: IntArray) {

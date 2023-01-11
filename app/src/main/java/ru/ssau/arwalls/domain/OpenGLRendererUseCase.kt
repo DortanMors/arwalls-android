@@ -40,7 +40,6 @@ class OpenGLRendererUseCase(
     )
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
-        coroutineScope.launch(Dispatchers.Main) {
             GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f)
 
             // Prepare the rendering objects. This involves reading shaders, so may throw an IOException.
@@ -51,23 +50,19 @@ class OpenGLRendererUseCase(
             } catch (e: IOException) {
                 Log.e(tag, "Failed to read an asset file", e)
             }
-        }
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
-        coroutineScope.launch(Dispatchers.Main) {
             displayRotationHelper.onSurfaceChanged(width, height)
             GLES20.glViewport(0, 0, width, height)
-        }
     }
 
     override fun onDrawFrame(gl: GL10) {
-        coroutineScope.launch(Dispatchers.Main) {
             // Clear screen to notify driver it should not load any pixels from previous frame.
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
             // Notify ARCore session that the view size changed so that the perspective matrix and
             // the video background can be properly adjusted.
-            val currentSession = session ?: return@launch
+            val currentSession = session ?: return
             try {
                 displayRotationHelper.updateSessionIfNeeded(currentSession)
                 currentSession.setCameraTextureName(backgroundRenderer.textureId)
@@ -85,7 +80,7 @@ class OpenGLRendererUseCase(
                 val points: FloatBuffer = create(
                     frame,
                     currentSession.createAnchor(camera.pose)
-                ) ?: return@launch
+                ) ?: return
                 depthRenderer.update(points)
                 depthRenderer.draw(camera)
                 SnackBarUseCase.hide()
@@ -95,12 +90,11 @@ class OpenGLRendererUseCase(
                     SnackBarUseCase.showMessage(
                         message = TrackingStateHelper.getTrackingFailureReasonString(camera)
                     )
-                    return@launch
+                    return
                 }
                 MapStore.updateMapState(points)
             } catch (t: Throwable) {
                 Log.e(tag, "Exception on the OpenGL thread", t)
             }
-        }
     }
 }
