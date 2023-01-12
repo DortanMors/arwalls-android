@@ -29,29 +29,31 @@ object MapStore {
     fun updateMapState(updateMapState: UpdateMapState) {
         coroutineScope.launch {
             Log.d("HARDCODE", "emit")
-            mutableMapPointsState.emit(
-                mutableMapPointsState.value.apply {
-                    updateMapState.points.forEach { point ->
-                        path.addCircle(
-                            point.x,
-                            point.y,
-                            Settings.mapPointRadius,
-                            Path.Direction.CW,
-                        )
-                    }
-                }
-            )
+//            mutableMapPointsState.emit(
+//                MapState(
+//                    Path().apply {
+//                        updateMapState.points.forEach { point ->
+//                            addCircle(
+//                                point.x,
+//                                point.y,
+//                                Settings.mapPointRadius,
+//                                Path.Direction.CW,
+//                            )
+//                        }
+//                    }
+//                )
+//            )
         }
     }
 
     fun updateMapState(points: FloatBuffer) {
         coroutineScope.launch {
             val pointsArray = points.array()
-            val updatedPath = mutableMapPointsState.value.path
+            val updatedPath = Path()
             for (i in pointsArray.indices step FloatsPerPoint) {
                 updatedPath.addCircle(
-                    pointsArray[i] * Settings.mapScale,     // X
-                    pointsArray[i + 2] * Settings.mapScale, // Z
+                    pointsArray[i] * Settings.mapScale + Settings.mapOffset,     // X
+                    pointsArray[i + 2] * Settings.mapScale + Settings.mapOffset, // Z
                     Settings.mapPointRadius,
                     Path.Direction.CW,
                 )

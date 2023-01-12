@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                     config.apply {
                         depthMode = Config.DepthMode.RAW_DEPTH_ONLY
                         focusMode = Config.FocusMode.AUTO
-                        updateMode = Config.UpdateMode.LATEST_CAMERA_IMAGE
+                        updateMode = Config.UpdateMode.BLOCKING
                     }
                 )
                 resume()

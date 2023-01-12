@@ -11,5 +11,6 @@ object Settings {
     var minConfidence = 0.4
     var snackBackgroundColor = -0x40cdcdce
     var mapScale = 100
+    var mapOffset = 150f
     val maxNumberOfPointsToRender = 20000f
 }
