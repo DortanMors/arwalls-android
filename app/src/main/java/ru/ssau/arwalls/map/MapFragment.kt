@@ -23,9 +23,11 @@ class MapFragment: Fragment() {
         Log.d("HARDCODE", "onViewCreated")
         binding.map.post {
             binding.map.clear()
+            binding.map.centralize()
         }
         binding.redrawMap.setOnClickListener {
             binding.map.clear()
+            binding.map.centralize()
         }
         lifecycleScope.launchWhenResumed {
             Log.d("HARDCODE", "launchWhenResumed")

@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Arwalls</string>
     <string name="redraw_map">Перерисовать карту</string>
+    <string name="centralize">Центрировать координаты</string>
 </resources>

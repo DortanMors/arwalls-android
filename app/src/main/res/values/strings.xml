@@ -17,4 +17,5 @@
 <resources>
   <string name="app_name" translatable="false">Arwalls</string>
     <string name="redraw_map">Redraw map</string>
+  <string name="centralize">Centralize</string>
 </resources>

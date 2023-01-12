@@ -11,7 +11,8 @@ object Settings {
     var minConfidence = 0.45
     var snackBackgroundColor = -0x40cdcdce
     var mapScale = 100
-    var mapOffset = 150f
+    var mapOffsetX = 0f
+    var mapOffsetY = 0f
     var scanVerticalRadius = 0.15
     val maxNumberOfPointsToRender = 20000f
 }

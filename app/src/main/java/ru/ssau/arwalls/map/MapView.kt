@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import ru.ssau.arwalls.common.Settings
+import ru.ssau.arwalls.data.MapPoint
 import ru.ssau.arwalls.rawdepth.FloatsPerPoint
 import ru.ssau.arwalls.ui.model.MapState
 
@@ -20,9 +21,19 @@ class MapView @JvmOverloads constructor(
 ) : View(context, attrs, defStyle) {
 
     private var bitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
+    private var cameraPosition = MapPoint(0f, 0f)
 
     fun clear() {
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    }
+
+    fun centralize() {
+        val xOffset = width / 2f - cameraPosition.x
+        val yOffset = height / 2f - cameraPosition.y
+        Settings.mapOffsetX = xOffset
+        Settings.mapOffsetY = yOffset
+        val canvas = Canvas(bitmap)
+        canvas.translate(xOffset, yOffset)
     }
 
     fun setMapState(mapState: MapState) {
@@ -30,13 +41,17 @@ class MapView @JvmOverloads constructor(
         if (width <= 0) {
             return
         }
+        cameraPosition = MapPoint(
+            x = mapState.cameraPosition.x * Settings.mapScale + Settings.mapOffsetX,
+            y = mapState.cameraPosition.y * Settings.mapScale + Settings.mapOffsetY,
+        )
         val pointsArray = mapState.points.array()
         try {
             for (i in pointsArray.indices step FloatsPerPoint) {
                 if (pointsArray[i + 1] in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
                     bitmap.setPixel(
-                        (pointsArray[i] * Settings.mapScale + Settings.mapOffset).toInt(),     // X
-                        (pointsArray[i + 2] * Settings.mapScale + Settings.mapOffset).toInt(), // Z
+                        (pointsArray[i] * Settings.mapScale + Settings.mapOffsetX).toInt(),     // X
+                        (pointsArray[i + 2] * Settings.mapScale + Settings.mapOffsetY).toInt(), // Z
                         Settings.paintColor,
                     )
                 }
