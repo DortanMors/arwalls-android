@@ -21,8 +21,11 @@ class MapFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("HARDCODE", "onViewCreated")
+        binding.map.post {
+            binding.map.clear()
+        }
         binding.redrawMap.setOnClickListener {
-            binding.map.invalidate()
+            binding.map.clear()
         }
         lifecycleScope.launchWhenResumed {
             Log.d("HARDCODE", "launchWhenResumed")

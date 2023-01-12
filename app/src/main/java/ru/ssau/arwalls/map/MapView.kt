@@ -4,13 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import kotlin.math.floor
 import ru.ssau.arwalls.common.Settings
 import ru.ssau.arwalls.rawdepth.FloatsPerPoint
 import ru.ssau.arwalls.ui.model.MapState
@@ -21,9 +19,10 @@ class MapView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : View(context, attrs, defStyle) {
 
-    private var path: Path = Path()
-    private val bitmap by lazy {
-        Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    private var bitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)
+
+    fun clear() {
+        bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     }
 
     fun setMapState(mapState: MapState) {
