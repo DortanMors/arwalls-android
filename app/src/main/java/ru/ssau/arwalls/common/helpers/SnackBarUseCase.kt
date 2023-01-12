@@ -93,7 +93,7 @@ object SnackBarUseCase {
             lastSnackBar?.dismiss()
             lastSnackBar = null
         } else {
-            Snackbar.make(
+            lastSnackBar = Snackbar.make(
                 findViewById(android.R.id.content),
                 snackBarInfo.message,
                 Snackbar.LENGTH_INDEFINITE
@@ -116,7 +116,8 @@ object SnackBarUseCase {
                         )
                     }
                 }
-            }.show()
+                show()
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import ru.ssau.arwalls.common.Settings
+import ru.ssau.arwalls.common.drawMarker
 import ru.ssau.arwalls.data.MapPoint
 import ru.ssau.arwalls.rawdepth.FloatsPerPoint
 import ru.ssau.arwalls.ui.model.MapState
@@ -66,18 +67,21 @@ class MapView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(bitmap, 0f, 0f, bitmapPaint)
+        canvas.drawMarker(cameraPosition, Settings.markerSize, markerPaint)
         Log.d("HARDCODE", "onDraw")
     }
 
     companion object {
-        private val paint = Paint().apply {
+        val bitmapPaint = Paint().apply {
             color = Settings.paintColor
-            style = Settings.paintStyle
-            strokeWidth = Settings.strokeWidth
-        }
-        val bitmapPaint = Paint(paint).apply {
             flags = Paint.DITHER_FLAG
             colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
         }
+        val markerPaint = Paint().apply {
+            color = Settings.markerColor
+            style = Settings.paintStyle
+            strokeWidth = Settings.strokeWidth
+        }
     }
 }
+

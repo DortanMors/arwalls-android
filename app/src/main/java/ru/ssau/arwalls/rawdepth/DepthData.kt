@@ -14,6 +14,8 @@ import java.nio.ShortBuffer
 import kotlin.experimental.and
 import kotlin.math.ceil
 import kotlin.math.sqrt
+import ru.ssau.arwalls.data.MapPoint
+import ru.ssau.arwalls.ui.model.MapState
 
 
 /**
@@ -25,7 +27,7 @@ import kotlin.math.sqrt
 const val FloatsPerPoint = 4 // X, Y, Z, confidence
 
 
-fun create(frame: Frame, cameraPoseAnchor: Anchor): FloatBuffer? {
+fun create(frame: Frame, cameraPoseAnchor: Anchor): MapState? {
     try {
         val depthImage: Image = frame.acquireRawDepthImage16Bits()
         val confidenceImage: Image = frame.acquireRawDepthConfidenceImage()
@@ -42,7 +44,13 @@ fun create(frame: Frame, cameraPoseAnchor: Anchor): FloatBuffer? {
         )
         depthImage.close()
         confidenceImage.close()
-        return points
+        return MapState(
+            points,
+            MapPoint(
+                x = frame.camera.pose.tx(),
+                y = frame.camera.pose.tz(),
+            ),
+        )
     } catch (e: NotYetAvailableException) {
         // This normally means that depth data is not available yet.
         // This is normal, so you don't have to spam the logcat with this.

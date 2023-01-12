@@ -23,6 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import ru.ssau.arwalls.data.MapPoint
+import ru.ssau.arwalls.ui.model.MapState
 
 class OpenGLRendererUseCase(
     private val context: Context,
@@ -77,10 +79,11 @@ class OpenGLRendererUseCase(
                 backgroundRenderer.draw(frame)
 
                 // Retrieve the depth data for this frame.
-                val points: FloatBuffer = create(
+                val mapState = create(
                     frame,
                     currentSession.createAnchor(camera.pose)
                 ) ?: return
+                val points: FloatBuffer = mapState.points
                 depthRenderer.update(points)
                 depthRenderer.draw(camera)
                 SnackBarUseCase.hide()
@@ -92,7 +95,7 @@ class OpenGLRendererUseCase(
                     )
                     return
                 }
-                MapStore.updateMapState(points)
+                MapStore.updateMapState(mapState)
             } catch (t: Throwable) {
                 Log.e(tag, "Exception on the OpenGL thread", t)
             }
