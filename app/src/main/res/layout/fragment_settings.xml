@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/dark_transparent"
+    >
+
+    <include
+        android:id="@+id/marker_visibility"
+        layout="@layout/item_checkbox"
+        />
+    <include
+        android:id="@+id/accuracy"
+        layout="@layout/item_slider"
+        />
+    <include
+        android:id="@+id/vertical_radius"
+        layout="@layout/item_slider"
+        />
+    <include
+        android:id="@+id/height_offset"
+        layout="@layout/item_slider"
+        />
+    <include
+        android:id="@+id/max_render_points"
+        layout="@layout/item_slider"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:text="@string/save"
+        />
+
+</LinearLayout>

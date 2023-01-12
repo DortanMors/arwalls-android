@@ -40,6 +40,7 @@ import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 import kotlinx.coroutines.launch
 import ru.ssau.arwalls.common.tag
+import ru.ssau.arwalls.ui.screen.settings.SettingsFragment
 
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
@@ -63,6 +64,16 @@ class MainActivity : AppCompatActivity() {
             displayRotationHelper = displayRotationHelper,
         )
 
+        binding.settings.setOnClickListener {
+            supportFragmentManager.run {
+                if (backStackEntryCount == 0) {
+                    supportFragmentManager.beginTransaction()
+                        .add(android.R.id.content, SettingsFragment.newInstance(), SettingsFragment.tag)
+                        .addToBackStack(SettingsFragment.tag)
+                        .commit()
+                }
+            }
+        }
         // Set up renderer.
         binding.surfaceView.run {
             preserveEGLContextOnPause = true

@@ -3,4 +3,10 @@
     <string name="app_name">Arwalls</string>
     <string name="redraw_map">Перерисовать карту</string>
     <string name="centralize">Центрировать координаты</string>
+    <string name="save">OK</string>
+    <string name="accuracy">Точность</string>
+    <string name="marker_visibility">Показать маркер</string>
+    <string name="vertical_radius">Вертикальный угол обзора</string>
+    <string name="height_offset">Высота обзора</string>
+    <string name="max_render_points">Макс. число видимых точек</string>
 </resources>

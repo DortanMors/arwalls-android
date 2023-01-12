@@ -49,7 +49,7 @@ class MapView @JvmOverloads constructor(
         val pointsArray = mapState.points.array()
         try {
             for (i in pointsArray.indices step FloatsPerPoint) {
-                if (pointsArray[i + 1] in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
+                if (pointsArray[i + 1] - Settings.heightOffset in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
                     bitmap.setPixel(
                         (pointsArray[i] * Settings.mapScale + Settings.mapOffsetX).toInt(),     // X
                         (pointsArray[i + 2] * Settings.mapScale + Settings.mapOffsetY).toInt(), // Z
@@ -67,7 +67,9 @@ class MapView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(bitmap, 0f, 0f, bitmapPaint)
-        canvas.drawMarker(cameraPosition, Settings.markerSize, markerPaint)
+        if (Settings.markerVisibility) {
+            canvas.drawMarker(cameraPosition, Settings.markerSize, markerPaint)
+        }
         Log.d("HARDCODE", "onDraw")
     }
 
