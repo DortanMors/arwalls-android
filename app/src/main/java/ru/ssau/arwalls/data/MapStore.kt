@@ -29,20 +29,20 @@ object MapStore {
     fun updateMapState(updateMapState: UpdateMapState) {
         coroutineScope.launch {
             Log.d("HARDCODE", "emit")
-//            mutableMapPointsState.emit(
-//                MapState(
-//                    Path().apply {
-//                        updateMapState.points.forEach { point ->
-//                            addCircle(
-//                                point.x,
-//                                point.y,
-//                                Settings.mapPointRadius,
-//                                Path.Direction.CW,
-//                            )
-//                        }
-//                    }
-//                )
-//            )
+            mutableMapPointsState.emit(
+                MapState(
+                    Path().apply {
+                        updateMapState.points.forEach { point ->
+                            addCircle(
+                                point.x,
+                                point.y,
+                                Settings.mapPointRadius,
+                                Path.Direction.CW,
+                            )
+                        }
+                    }
+                )
+            )
         }
     }
 
@@ -51,12 +51,14 @@ object MapStore {
             val pointsArray = points.array()
             val updatedPath = Path()
             for (i in pointsArray.indices step FloatsPerPoint) {
-                updatedPath.addCircle(
-                    pointsArray[i] * Settings.mapScale + Settings.mapOffset,     // X
-                    pointsArray[i + 2] * Settings.mapScale + Settings.mapOffset, // Z
-                    Settings.mapPointRadius,
-                    Path.Direction.CW,
-                )
+                if (pointsArray[i + 1] in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
+                    updatedPath.addCircle(
+                        pointsArray[i] * Settings.mapScale + Settings.mapOffset,     // X
+                        pointsArray[i + 2] * Settings.mapScale + Settings.mapOffset, // Z
+                        Settings.mapPointRadius,
+                        Path.Direction.CW,
+                    )
+                }
             }
             mutableMapPointsState.emit(
                 MapState(
