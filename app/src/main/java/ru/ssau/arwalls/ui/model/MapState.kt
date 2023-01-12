@@ -1,9 +1,7 @@
 package ru.ssau.arwalls.ui.model
 
-import android.graphics.Path
+import java.nio.FloatBuffer
 
 class MapState(
-    val path: Path = Path().apply {
-        moveTo(0f, 0f)
-    },
+    val points: FloatBuffer = FloatBuffer.allocate(0),
 )

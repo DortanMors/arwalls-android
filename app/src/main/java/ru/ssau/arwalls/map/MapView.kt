@@ -10,7 +10,9 @@ import android.graphics.PorterDuffColorFilter
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import kotlin.math.floor
 import ru.ssau.arwalls.common.Settings
+import ru.ssau.arwalls.rawdepth.FloatsPerPoint
 import ru.ssau.arwalls.ui.model.MapState
 
 class MapView @JvmOverloads constructor(
@@ -25,19 +27,31 @@ class MapView @JvmOverloads constructor(
     }
 
     fun setMapState(mapState: MapState) {
+        Log.d("HARDCODE", "setMapState")
         if (width <= 0) {
             return
         }
-        Log.d("HARDCODE", "setMapState")
-        path = mapState.path
-        val canvas = Canvas(bitmap)
-        draw(canvas)
+        val pointsArray = mapState.points.array()
+        try {
+            for (i in pointsArray.indices step FloatsPerPoint) {
+                if (pointsArray[i + 1] in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
+                    bitmap.setPixel(
+                        (pointsArray[i] * Settings.mapScale + Settings.mapOffset).toInt(),     // X
+                        (pointsArray[i + 2] * Settings.mapScale + Settings.mapOffset).toInt(), // Z
+                        Settings.paintColor,
+                    )
+                }
+            }
+        }
+        catch (e: Exception) {
+            Log.e("HARDCODE", "setMapState", e)
+        }
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvas.drawBitmap(bitmap, 0f, 0f, bitmapPaint)
-        canvas.drawPath(path, paint)
         Log.d("HARDCODE", "onDraw")
     }
 

@@ -8,10 +8,10 @@ object Settings {
     var strokeWidth = 2f
     var paintColor = Color.RED
     var paintStyle = Paint.Style.FILL
-    var minConfidence = 0.4
+    var minConfidence = 0.45
     var snackBackgroundColor = -0x40cdcdce
     var mapScale = 100
     var mapOffset = 150f
-    var scanVerticalRadius = 0.3
+    var scanVerticalRadius = 0.15
     val maxNumberOfPointsToRender = 20000f
 }
