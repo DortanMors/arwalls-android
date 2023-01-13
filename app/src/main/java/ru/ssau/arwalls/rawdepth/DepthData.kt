@@ -5,8 +5,6 @@ import android.opengl.Matrix
 import com.google.ar.core.Anchor
 import com.google.ar.core.CameraIntrinsics
 import com.google.ar.core.Frame
-import ru.ssau.arwalls.common.Settings
-import com.google.ar.core.exceptions.NotYetAvailableException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -14,8 +12,7 @@ import java.nio.ShortBuffer
 import kotlin.experimental.and
 import kotlin.math.ceil
 import kotlin.math.sqrt
-import ru.ssau.arwalls.data.MapPoint
-import ru.ssau.arwalls.ui.model.MapState
+import ru.ssau.arwalls.common.Settings
 
 
 /**
@@ -26,37 +23,23 @@ import ru.ssau.arwalls.ui.model.MapState
 
 const val FloatsPerPoint = 4 // X, Y, Z, confidence
 
-
-fun create(frame: Frame, cameraPoseAnchor: Anchor): MapState? {
-    try {
-        val depthImage: Image = frame.acquireRawDepthImage16Bits()
-        val confidenceImage: Image = frame.acquireRawDepthConfidenceImage()
-
-        // Retrieve the intrinsic camera parameters corresponding to the depth image to
-        // transform 2D depth pixels into 3D points. See more information about the depth values
-        // at
-        // https://developers.google.com/ar/develop/java/depth/overview#understand-depth-values.
-        val intrinsics: CameraIntrinsics = frame.camera.textureIntrinsics
-        val modelMatrix = FloatArray(16)
-        cameraPoseAnchor.pose.toMatrix(modelMatrix, 0) // задание системы координат
-        val points: FloatBuffer = convertRawDepthImagesTo3dPointBuffer(
-            depthImage, confidenceImage, intrinsics, modelMatrix
-        )
-        depthImage.close()
-        confidenceImage.close()
-        return MapState(
-            points,
-            MapPoint(
-                x = frame.camera.pose.tx(),
-                y = frame.camera.pose.tz(),
-            ),
-        )
-    } catch (e: NotYetAvailableException) {
-        // This normally means that depth data is not available yet.
-        // This is normal, so you don't have to spam the logcat with this.
-    }
-    return null
-}
+fun Frame.create(cameraPoseAnchor: Anchor): FloatBuffer? =
+    kotlin.runCatching {
+        acquireRawDepthImage16Bits().use { depthImage ->
+            acquireRawDepthConfidenceImage().use { confidenceImage ->
+                // Retrieve the intrinsic camera parameters corresponding to the depth image to
+                // transform 2D depth pixels into 3D points. See more information about the depth values
+                // at
+                // https://developers.google.com/ar/develop/java/depth/overview#understand-depth-values.
+                val intrinsics: CameraIntrinsics = camera.textureIntrinsics
+                val modelMatrix = FloatArray(16)
+                cameraPoseAnchor.pose.toMatrix(modelMatrix, 0) // задание системы координат
+                convertRawDepthImagesTo3dPointBuffer(
+                    depthImage, confidenceImage, intrinsics, modelMatrix
+                )
+            }
+        }
+    }.getOrNull()
 
 /** Apply camera intrinsics to convert depth image into a 3D pointcloud.  */
 private fun convertRawDepthImagesTo3dPointBuffer(

@@ -4,16 +4,9 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.util.Log
+import com.google.ar.core.AugmentedImage
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
-import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
-import ru.ssau.arwalls.common.helpers.SnackBarUseCase
-import ru.ssau.arwalls.common.helpers.TrackingStateHelper
-import ru.ssau.arwalls.common.rendering.BackgroundRenderer
-import ru.ssau.arwalls.common.rendering.DepthRenderer
-import ru.ssau.arwalls.common.tag
-import ru.ssau.arwalls.data.MapStore
-import ru.ssau.arwalls.rawdepth.create
 import java.io.IOException
 import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
@@ -22,9 +15,18 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
+import ru.ssau.arwalls.common.helpers.SnackBarUseCase
+import ru.ssau.arwalls.common.helpers.TrackingStateHelper
+import ru.ssau.arwalls.common.rendering.BackgroundRenderer
+import ru.ssau.arwalls.common.rendering.DepthRenderer
+import ru.ssau.arwalls.common.tag
+import ru.ssau.arwalls.data.Beacon
 import ru.ssau.arwalls.data.MapPoint
+import ru.ssau.arwalls.data.MapStore
+import ru.ssau.arwalls.rawdepth.create
 import ru.ssau.arwalls.ui.model.MapState
+
 
 class OpenGLRendererUseCase(
     private val context: Context,
@@ -79,11 +81,28 @@ class OpenGLRendererUseCase(
                 backgroundRenderer.draw(frame)
 
                 // Retrieve the depth data for this frame.
-                val mapState = create(
-                    frame,
-                    currentSession.createAnchor(camera.pose)
+                val updatedAugmentedImages = frame.getUpdatedTrackables(AugmentedImage::class.java)
+                val beacons = updatedAugmentedImages.map { img ->
+                    Beacon(
+                        id = img.index,
+                        point = MapPoint(
+                            x = img.centerPose.tx(),
+                            y = img.centerPose.tz(),
+                        ),
+                    )
+                }
+                MapStore.updateMapState(
+                    MapState(
+                        path = DrawBeaconMap(beacons),
+                        cameraPosition = MapPoint(
+                            x = frame.camera.pose.tx(),
+                            y = frame.camera.pose.tz(),
+                        )
+                    )
+                )
+                val points: FloatBuffer = frame.create(
+                    cameraPoseAnchor = currentSession.createAnchor(camera.pose)
                 ) ?: return
-                val points: FloatBuffer = mapState.points
                 depthRenderer.update(points)
                 depthRenderer.draw(camera)
                 SnackBarUseCase.hide()
@@ -95,7 +114,6 @@ class OpenGLRendererUseCase(
                     )
                     return
                 }
-                MapStore.updateMapState(mapState)
             } catch (t: Throwable) {
                 Log.e(tag, "Exception on the OpenGL thread", t)
             }
