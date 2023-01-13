@@ -28,6 +28,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import ru.ssau.arwalls.rawdepth.R
 
 /**
  * Helper to manage the sample snackbar. Hides the Android boilerplate code, and exposes simpler
@@ -100,7 +101,7 @@ object SnackBarUseCase {
             ).apply {
                 view.setBackgroundColor(Settings.snackBackgroundColor)
                 if (snackBarInfo is SnackBarInfo.DismissibleSnack) {
-                    setAction("Dismiss") {
+                    setAction(getString(R.string.dismiss)) {
                         coroutineScope.launch {
                             mutableSnackBarFlow.emit(SnackBarInfo.Hidden)
                         }

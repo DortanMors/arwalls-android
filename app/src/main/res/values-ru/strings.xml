@@ -9,4 +9,14 @@
     <string name="vertical_radius">Вертикальный угол обзора</string>
     <string name="height_offset">Высота обзора</string>
     <string name="max_render_points">Макс. число видимых точек</string>
+    <string name="camera_permission_error">Требуется разрешение на использование камеры</string>
+    <string name="waiting_depth">Поиск данных глубины…</string>
+    <string name="ar_session_error">Невозможно открыть AR сессию</string>
+    <string name="ar_support_error">AR недоступно на устройсте</string>
+    <string name="please_update">Приложение устарело</string>
+    <string name="update_arcore">Обновите ARCore</string>
+    <string name="depth_support_error">ARCore Raw Depth API недоступно на устройсте. Список поддерживаемых устройств https://developers.google.com/ar/devices.</string>
+    <string name="dismiss">Закрыть</string>
+    <string name="install_arcore">Установите ARCore</string>
+    <string name="camera_error">Камера недоступна. Перезапустите приложение.</string>
 </resources>

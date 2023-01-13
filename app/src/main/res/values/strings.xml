@@ -16,12 +16,22 @@
 -->
 <resources>
   <string name="app_name" translatable="false">Arwalls</string>
-    <string name="redraw_map">Redraw map</string>
-    <string name="centralize">Centralize</string>
-    <string name="save">OK</string>
-    <string name="accuracy">Accuracy</string>
-    <string name="marker_visibility">Marker visibility</string>
-    <string name="vertical_radius">Vertical radius</string>
-    <string name="height_offset">Overview height</string>
-    <string name="max_render_points">Max render points</string>
+  <string name="redraw_map">Redraw map</string>
+  <string name="centralize">Centralize</string>
+  <string name="save">OK</string>
+  <string name="accuracy">Accuracy</string>
+  <string name="marker_visibility">Marker visibility</string>
+  <string name="vertical_radius">Vertical radius</string>
+  <string name="height_offset">Overview height</string>
+  <string name="max_render_points">Max render points</string>
+  <string name="camera_permission_error">Camera permission is needed to run this application</string>
+  <string name="waiting_depth">Waiting for depth data…</string>
+  <string name="camera_error">Camera not available. Try restarting the app.</string>
+  <string name="ar_session_error">Failed to create AR session</string>
+  <string name="ar_support_error">This device does not support AR</string>
+  <string name="please_update">Please update this app</string>
+  <string name="update_arcore">Please update ARCore</string>
+  <string name="install_arcore">Please install ARCore</string>
+  <string name="depth_support_error">This device does not support the ARCore Raw Depth API. See https://developers.google.com/ar/devices for a list of devices that do.</string>
+  <string name="dismiss">Dismiss</string>
 </resources>

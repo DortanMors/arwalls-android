@@ -118,26 +118,26 @@ class MainActivity : AppCompatActivity() {
                 // Creates the ARCore session.
                 openGLRendererUseCase.session = Session( /* context = */this).also { newSession ->
                     if (!newSession.isDepthModeSupported(Config.DepthMode.RAW_DEPTH_ONLY)) {
-                        message = "This device does not support the ARCore Raw Depth API. See https://developers.google.com/ar/devices for a list of devices that do."
+                        message = getString(R.string.depth_support_error)
                     }
                 }
             } catch (e: UnavailableArcoreNotInstalledException) {
-                message = "Please install ARCore"
+                message = getString(R.string.install_arcore)
                 exception = e
             } catch (e: UnavailableUserDeclinedInstallationException) {
-                message = "Please install ARCore"
+                message = getString(R.string.install_arcore)
                 exception = e
             } catch (e: UnavailableApkTooOldException) {
-                message = "Please update ARCore"
+                message = getString(R.string.update_arcore)
                 exception = e
             } catch (e: UnavailableSdkTooOldException) {
-                message = "Please update this app"
+                message = getString(R.string.please_update)
                 exception = e
             } catch (e: UnavailableDeviceNotCompatibleException) {
-                message = "This device does not support AR"
+                message = getString(R.string.ar_support_error)
                 exception = e
             } catch (e: Exception) {
-                message = "Failed to create AR session"
+                message = getString(R.string.ar_session_error)
                 exception = e
             }
             message?.let { errorMessage ->
@@ -158,14 +158,14 @@ class MainActivity : AppCompatActivity() {
                 resume()
             }
         } catch (e: CameraNotAvailableException) {
-            snackBarUseCase.showError("Camera not available. Try restarting the app.")
+            snackBarUseCase.showError(getString(R.string.camera_error))
             return
         }
 
         // Note that order matters - see the note in onPause(), the reverse applies here.
         binding.surfaceView.onResume()
         displayRotationHelper.onResume()
-        snackBarUseCase.showMessage("Waiting for depth data...")
+        snackBarUseCase.showMessage(getString(R.string.waiting_depth))
     }
 
     public override fun onPause() {
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, results)
         if (!CameraPermissionHelper.hasCameraPermission(this)) {
             Toast.makeText(
-                this, "Camera permission is needed to run this application",
+                this, getString(R.string.camera_permission_error),
                 Toast.LENGTH_LONG
             ).show()
             if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
