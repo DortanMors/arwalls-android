@@ -4,7 +4,7 @@ apply plugin: 'org.jetbrains.kotlin.android'
 android {
     compileSdkVersion 33
     defaultConfig {
-        applicationId "ru.ssau.arwalls"
+        applicationId "ru.ssau.arwalls.bread"
 
         // AR Optional apps must declare minSdkVersion >= 14.
         // AR Required apps must declare minSdkVersion >= 24.
@@ -14,7 +14,7 @@ android {
         def minorVersionCode = 1
         versionCode majorVersionCode * 100000 + minorVersionCode * 1000 + generateVersionCode()
         versionName "$majorVersionCode.$minorVersionCode.${generateVersionCode()}"
-        setProperty("archivesBaseName", "Arwalls" + "-v" + versionName)
+        setProperty("archivesBaseName", "Arwalls-bread" + "-v" + versionName)
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

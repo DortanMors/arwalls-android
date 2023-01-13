@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Arwalls</string>
     <string name="redraw_map">Перерисовать карту</string>
     <string name="centralize">Центрировать координаты</string>
     <string name="save">OK</string>
