@@ -12,7 +12,7 @@ object DrawBeaconMap {
                 path.moveTo(point.x * Settings.mapScale + Settings.mapOffsetX, point.y * Settings.mapScale + Settings.mapOffsetY)
             }
             sortedBeacons.forEach {
-                path.lineTo(it.point.x, it.point.y)
+                path.lineTo(it.point.x * Settings.mapScale + Settings.mapOffsetX, it.point.y * Settings.mapScale + Settings.mapOffsetY)
             }
             path
         }
