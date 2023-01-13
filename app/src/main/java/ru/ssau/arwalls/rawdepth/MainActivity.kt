@@ -19,6 +19,7 @@ import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.ar.core.ArCoreApk
@@ -98,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (openGLRendererUseCase.session == null) {
             var exception: Exception? = null
-            var message: String? = null
+            @StringRes var messageId: Int? = null
             try {
                 when (ArCoreApk.getInstance().requestInstall(this, !installRequested)) {
                     InstallStatus.INSTALL_REQUESTED -> {
@@ -118,30 +119,30 @@ class MainActivity : AppCompatActivity() {
                 // Creates the ARCore session.
                 openGLRendererUseCase.session = Session( /* context = */this).also { newSession ->
                     if (!newSession.isDepthModeSupported(Config.DepthMode.RAW_DEPTH_ONLY)) {
-                        message = getString(R.string.depth_support_error)
+                        messageId = R.string.depth_support_error
                     }
                 }
             } catch (e: UnavailableArcoreNotInstalledException) {
-                message = getString(R.string.install_arcore)
+                messageId = R.string.install_arcore
                 exception = e
             } catch (e: UnavailableUserDeclinedInstallationException) {
-                message = getString(R.string.install_arcore)
+                messageId = R.string.install_arcore
                 exception = e
             } catch (e: UnavailableApkTooOldException) {
-                message = getString(R.string.update_arcore)
+                messageId = R.string.update_arcore
                 exception = e
             } catch (e: UnavailableSdkTooOldException) {
-                message = getString(R.string.please_update)
+                messageId = R.string.please_update
                 exception = e
             } catch (e: UnavailableDeviceNotCompatibleException) {
-                message = getString(R.string.ar_support_error)
+                messageId = R.string.ar_support_error
                 exception = e
             } catch (e: Exception) {
-                message = getString(R.string.ar_session_error)
+                messageId = R.string.ar_session_error
                 exception = e
             }
-            message?.let { errorMessage ->
-                snackBarUseCase.showError(errorMessage)
+            messageId?.let { errorMessageId ->
+                snackBarUseCase.showError(errorMessageId)
                 Log.e(tag, "Exception creating session", exception)
                 return
             }
@@ -158,14 +159,14 @@ class MainActivity : AppCompatActivity() {
                 resume()
             }
         } catch (e: CameraNotAvailableException) {
-            snackBarUseCase.showError(getString(R.string.camera_error))
+            snackBarUseCase.showError(R.string.camera_error)
             return
         }
 
         // Note that order matters - see the note in onPause(), the reverse applies here.
         binding.surfaceView.onResume()
         displayRotationHelper.onResume()
-        snackBarUseCase.showMessage(getString(R.string.waiting_depth))
+        snackBarUseCase.showMessage(R.string.waiting_depth)
     }
 
     public override fun onPause() {

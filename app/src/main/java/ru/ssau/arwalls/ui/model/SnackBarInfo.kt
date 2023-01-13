@@ -1,9 +1,12 @@
 package ru.ssau.arwalls.ui.model
 
-sealed class SnackBarInfo(val message: String) {
-    class SnackWithMessage(message: String) : SnackBarInfo(message)
-    sealed class DismissibleSnack(message: String) : SnackBarInfo(message)
-    class WarnSnack(message: String) : DismissibleSnack(message)
-    class ErrorSnack(message: String) : DismissibleSnack(message)
-    object Hidden : DismissibleSnack("")
+import androidx.annotation.StringRes
+import ru.ssau.arwalls.rawdepth.R
+
+sealed class SnackBarInfo(@StringRes val messageId: Int) {
+    class SnackWithMessage(@StringRes messageId: Int) : SnackBarInfo(messageId)
+    sealed class DismissibleSnack(@StringRes messageId: Int) : SnackBarInfo(messageId)
+    class WarnSnack(@StringRes messageId: Int) : DismissibleSnack(messageId)
+    class ErrorSnack(@StringRes messageId: Int) : DismissibleSnack(messageId)
+    object Hidden : DismissibleSnack(R.string.empty)
 }

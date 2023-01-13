@@ -8,7 +8,6 @@ import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
 import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
 import ru.ssau.arwalls.common.helpers.SnackBarUseCase
-import ru.ssau.arwalls.common.helpers.TrackingStateHelper
 import ru.ssau.arwalls.common.rendering.BackgroundRenderer
 import ru.ssau.arwalls.common.rendering.DepthRenderer
 import ru.ssau.arwalls.common.tag
@@ -22,9 +21,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import ru.ssau.arwalls.data.MapPoint
-import ru.ssau.arwalls.ui.model.MapState
+import ru.ssau.arwalls.rawdepth.R
 
 class OpenGLRendererUseCase(
     private val context: Context,
@@ -91,7 +88,7 @@ class OpenGLRendererUseCase(
                 // If not tracking, show tracking failure reason instead.
                 if (camera.trackingState == TrackingState.PAUSED) {
                     SnackBarUseCase.showMessage(
-                        message = TrackingStateHelper.getTrackingFailureReasonString(camera)
+                        messageId = R.string.no_tracking,
                     )
                     return
                 }

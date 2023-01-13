@@ -34,4 +34,8 @@
   <string name="install_arcore">Please install ARCore</string>
   <string name="depth_support_error">This device does not support the ARCore Raw Depth API. See https://developers.google.com/ar/devices for a list of devices that do.</string>
   <string name="dismiss">Dismiss</string>
+  <string name="hold_above">Hold above</string>
+  <string name="hold_below">Hold below</string>
+  <string name="no_tracking">No tracking</string>
+  <string name="empty" translatable="false" />
 </resources>

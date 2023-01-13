@@ -16,6 +16,7 @@ package ru.ssau.arwalls.common.helpers
 
 import android.app.Activity
 import android.util.Log
+import androidx.annotation.StringRes
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import ru.ssau.arwalls.common.Settings
@@ -47,22 +48,22 @@ object SnackBarUseCase {
             CoroutineExceptionHandler { _, throwable -> Log.e(tag, throwable.toString()) }
     )
 
-    private var lastMessage = ""
+    private var lastMessageId = -1
 
     /** Shows a snackbar with a given message.  */
-    fun showMessage(message: String) {
-        if (lastMessage != message) {
-            lastMessage = message
+    fun showMessage(@StringRes messageId: Int) {
+        if (lastMessageId != messageId) {
+            lastMessageId = messageId
             coroutineScope.launch {
-                mutableSnackBarFlow.emit(SnackBarInfo.SnackWithMessage(message))
+                mutableSnackBarFlow.emit(SnackBarInfo.SnackWithMessage(messageId))
             }
         }
     }
 
     /** Shows a snackbar with a given message, and a dismiss button.  */
-    fun showMessageWithDismiss(message: String) {
+    fun showMessageWithDismiss(@StringRes messageId: Int) {
         coroutineScope.launch {
-            mutableSnackBarFlow.emit(SnackBarInfo.WarnSnack(message))
+            mutableSnackBarFlow.emit(SnackBarInfo.WarnSnack(messageId))
         }
     }
 
@@ -70,9 +71,9 @@ object SnackBarUseCase {
      * Shows a snackbar with a given error message. When dismissed, will finish the activity. Useful
      * for notifying errors, where no further interaction with the activity is possible.
      */
-    fun showError(errorMessage: String) {
+    fun showError(@StringRes errorMessageId: Int) {
         coroutineScope.launch {
-            mutableSnackBarFlow.emit(SnackBarInfo.ErrorSnack(errorMessage))
+            mutableSnackBarFlow.emit(SnackBarInfo.ErrorSnack(errorMessageId))
         }
     }
 
@@ -81,7 +82,7 @@ object SnackBarUseCase {
      * call even if snackbar is not shown.
      */
     fun hide() {
-        lastMessage = ""
+        lastMessageId = -1
         coroutineScope.launch {
             mutableSnackBarFlow.emit(SnackBarInfo.Hidden)
         }
@@ -90,13 +91,13 @@ object SnackBarUseCase {
     fun Activity.showSnackBar(
         snackBarInfo: SnackBarInfo,
     ) {
-        if (snackBarInfo is SnackBarInfo.Hidden) {
-            lastSnackBar?.dismiss()
-            lastSnackBar = null
+        lastSnackBar?.dismiss()
+        lastSnackBar = if (snackBarInfo is SnackBarInfo.Hidden) {
+            null
         } else {
-            lastSnackBar = Snackbar.make(
+            Snackbar.make(
                 findViewById(android.R.id.content),
-                snackBarInfo.message,
+                getString(snackBarInfo.messageId),
                 Snackbar.LENGTH_INDEFINITE
             ).apply {
                 view.setBackgroundColor(Settings.snackBackgroundColor)
