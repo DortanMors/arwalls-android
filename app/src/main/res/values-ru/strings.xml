@@ -19,4 +19,5 @@
     <string name="dismiss">Закрыть</string>
     <string name="install_arcore">Установите ARCore</string>
     <string name="camera_error">Камера недоступна. Перезапустите приложение.</string>
+    <string name="database_error">База меток недоступна. Перезапустите приложение.</string>
 </resources>

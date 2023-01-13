@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
             snackBarUseCase.showError(getString(R.string.camera_error))
             return
         } catch (e: IOException) {
-            snackBarUseCase.showError("Images database not available. Try restarting the app.")
+            snackBarUseCase.showError(getString(R.string.database_error))
             return
         }
 
