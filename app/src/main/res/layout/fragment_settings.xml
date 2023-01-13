@@ -13,15 +13,7 @@
         layout="@layout/item_checkbox"
         />
     <include
-        android:id="@+id/accuracy"
-        layout="@layout/item_slider"
-        />
-    <include
-        android:id="@+id/vertical_radius"
-        layout="@layout/item_slider"
-        />
-    <include
-        android:id="@+id/height_offset"
+        android:id="@+id/map_scale"
         layout="@layout/item_slider"
         />
     <include
