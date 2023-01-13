@@ -15,7 +15,6 @@
    limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="ru.ssau.arwalls.rawdepth">
 
   <uses-permission android:name="android.permission.CAMERA"/>
@@ -31,7 +30,7 @@
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="false"
       android:largeHeap="true"
-      tools:ignore="GoogleAppIndexingWarning">
+      android:dataExtractionRules="@xml/data_extraction_rules">
 
     <activity
         android:name="ru.ssau.arwalls.rawdepth.MainActivity"
@@ -46,10 +45,5 @@
     <!-- This tag indicates that this application requires ARCore.  This results in the Google Play
          Store downloading and installing ARCore along with the application. -->
     <meta-data android:name="com.google.ar.core" android:value="required" />
-
-    <!-- Enable use of unsigned ARCore APKs and disable Play Store submission. -->
-    <meta-data
-        android:name="com.google.ar.core.disable_security_check"
-        android:value="true" />
   </application>
 </manifest>
