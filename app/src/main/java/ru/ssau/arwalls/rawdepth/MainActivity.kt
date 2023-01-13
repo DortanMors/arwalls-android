@@ -23,24 +23,28 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.ArCoreApk.InstallStatus
+import com.google.ar.core.AugmentedImageDatabase
 import com.google.ar.core.Config
 import com.google.ar.core.Session
-import ru.ssau.arwalls.rawdepth.databinding.ActivityMainBinding
-import ru.ssau.arwalls.common.helpers.CameraPermissionHelper
-import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
-import ru.ssau.arwalls.common.helpers.FullScreenHelper
-import ru.ssau.arwalls.common.helpers.SnackBarUseCase
-import ru.ssau.arwalls.common.helpers.SnackBarUseCase.showSnackBar
-import ru.ssau.arwalls.domain.OpenGLRendererUseCase
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
+import java.io.IOException
 import kotlinx.coroutines.launch
+import ru.ssau.arwalls.common.Settings
+import ru.ssau.arwalls.common.helpers.CameraPermissionHelper
+import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
+import ru.ssau.arwalls.common.helpers.FullScreenHelper
+import ru.ssau.arwalls.common.helpers.SnackBarUseCase
+import ru.ssau.arwalls.common.helpers.SnackBarUseCase.showSnackBar
 import ru.ssau.arwalls.common.tag
+import ru.ssau.arwalls.domain.OpenGLRendererUseCase
+import ru.ssau.arwalls.rawdepth.databinding.ActivityMainBinding
 import ru.ssau.arwalls.ui.screen.settings.SettingsFragment
+
 
 /**
  * This is a simple example that shows how to create an augmented reality (AR) application using the
@@ -148,17 +152,24 @@ class MainActivity : AppCompatActivity() {
         }
         try {
             openGLRendererUseCase.session?.run {
+                val imageDatabase: AugmentedImageDatabase = assets.open(Settings.nameImagesDB).use { inputStream ->
+                    AugmentedImageDatabase.deserialize(/* session = */ this, /* inputStream = */ inputStream)
+                }
                 configure(
                     config.apply {
                         depthMode = Config.DepthMode.RAW_DEPTH_ONLY
                         focusMode = Config.FocusMode.AUTO
                         updateMode = Config.UpdateMode.BLOCKING
+                        augmentedImageDatabase = imageDatabase
                     }
                 )
                 resume()
             }
         } catch (e: CameraNotAvailableException) {
             snackBarUseCase.showError(getString(R.string.camera_error))
+            return
+        } catch (e: IOException) {
+            snackBarUseCase.showError("Images database not available. Try restarting the app.")
             return
         }
 

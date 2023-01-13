@@ -30,4 +30,6 @@ object Settings {
 
     const val MinRenderPoints = 0f
     const val MaxRenderPoints = 50000f
+
+    const val nameImagesDB = "tags.db.imgdb"
 }
