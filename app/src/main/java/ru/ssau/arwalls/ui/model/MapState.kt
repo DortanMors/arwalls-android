@@ -1,9 +1,9 @@
 package ru.ssau.arwalls.ui.model
 
-import java.nio.FloatBuffer
+import android.graphics.Path
 import ru.ssau.arwalls.data.MapPoint
 
 class MapState(
-    val points: FloatBuffer = FloatBuffer.allocate(0),
+    val path: Path = Path(),
     val cameraPosition: MapPoint = MapPoint(0f, 0f),
 )
