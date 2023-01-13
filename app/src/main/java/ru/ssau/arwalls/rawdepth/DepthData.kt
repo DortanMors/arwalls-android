@@ -14,6 +14,7 @@ import java.nio.ShortBuffer
 import kotlin.experimental.and
 import kotlin.math.ceil
 import kotlin.math.sqrt
+import ru.ssau.arwalls.common.Settings.HeightWarnings
 import ru.ssau.arwalls.common.helpers.SnackBarUseCase
 import ru.ssau.arwalls.data.MapPoint
 import ru.ssau.arwalls.ui.model.MapState
@@ -26,7 +27,6 @@ import ru.ssau.arwalls.ui.model.MapState
 
 
 const val FloatsPerPoint = 4 // X, Y, Z, confidence
-
 
 fun create(frame: Frame, cameraPoseAnchor: Anchor): MapState? {
     try {
@@ -45,11 +45,11 @@ fun create(frame: Frame, cameraPoseAnchor: Anchor): MapState? {
         )
         depthImage.close()
         confidenceImage.close()
-        val cameraY = frame.camera.pose.ty() - Settings.heightOffset
+        val cameraY = frame.camera.displayOrientedPose.ty() - Settings.heightOffset
         when {
             cameraY < -Settings.scanVerticalRadius -> SnackBarUseCase.showMessage(R.string.hold_above)
             cameraY > Settings.scanVerticalRadius -> SnackBarUseCase.showMessage(R.string.hold_below)
-            else -> SnackBarUseCase.hide()
+            else -> SnackBarUseCase.hide(HeightWarnings)
         }
         return MapState(
             points,

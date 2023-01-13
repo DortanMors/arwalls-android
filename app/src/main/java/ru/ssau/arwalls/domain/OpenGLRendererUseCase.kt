@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import ru.ssau.arwalls.common.Settings.NoTrackingWarnings
 import ru.ssau.arwalls.rawdepth.R
 
 class OpenGLRendererUseCase(
@@ -83,7 +84,7 @@ class OpenGLRendererUseCase(
                 val points: FloatBuffer = mapState.points
                 depthRenderer.update(points)
                 depthRenderer.draw(camera)
-                SnackBarUseCase.hide()
+                SnackBarUseCase.hide(NoTrackingWarnings)
 
                 // If not tracking, show tracking failure reason instead.
                 if (camera.trackingState == TrackingState.PAUSED) {

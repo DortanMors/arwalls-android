@@ -2,6 +2,7 @@ package ru.ssau.arwalls.common
 
 import android.graphics.Color
 import android.graphics.Paint
+import ru.ssau.arwalls.rawdepth.R
 
 object Settings {
     var markerVisibility = true
@@ -30,4 +31,7 @@ object Settings {
 
     const val MinRenderPoints = 0f
     const val MaxRenderPoints = 50000f
+
+    val NoTrackingWarnings = listOf(R.string.waiting_depth, R.string.no_tracking)
+    val HeightWarnings = listOf(R.string.hold_above, R.string.hold_below)
 }

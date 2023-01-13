@@ -81,10 +81,12 @@ object SnackBarUseCase {
      * Hides the currently showing snackbar, if there is one. Safe to call from any thread. Safe to
      * call even if snackbar is not shown.
      */
-    fun hide() {
-        lastMessageId = -1
+    fun hide(@StringRes messageId: Collection<Int>? = null) {
         coroutineScope.launch {
-            mutableSnackBarFlow.emit(SnackBarInfo.Hidden)
+            if (messageId?.contains(mutableSnackBarFlow.value.messageId) != false) {
+                lastMessageId = -1
+                mutableSnackBarFlow.emit(SnackBarInfo.Hidden)
+            }
         }
     }
 
