@@ -5,9 +5,9 @@
     <string name="save">OK</string>
     <string name="accuracy">Точность</string>
     <string name="marker_visibility">Показать маркер</string>
-    <string name="vertical_radius">Вертикальный угол обзора</string>
-    <string name="height_offset">Высота обзора</string>
-    <string name="max_render_points">Макс. число видимых точек</string>
+    <string name="vertical_radius">Длина вертикали обзора</string>
+    <string name="height_offset">Смещение высоты обзора</string>
+    <string name="max_render_points">Максимальное число видимых точек</string>
     <string name="camera_permission_error">Требуется разрешение на использование камеры</string>
     <string name="waiting_depth">Поиск данных глубины…</string>
     <string name="ar_session_error">Невозможно открыть AR сессию</string>
