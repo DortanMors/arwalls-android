@@ -9,14 +9,12 @@ object Settings {
     var markerSize = 20f // размер маркера позиции
     var paintColor = Color.RED
     var markerColor = Color.GREEN
-    var paintStyle = Paint.Style.FILL
+    var paintStyle = Paint.Style.STROKE
     var minConfidence = 0.45f // минимальная планка достоверности точки, иначе отбрасывеется
     var snackBackgroundColor = -0x40cdcdce
     var mapScale = 100f
     var mapOffsetX = 0f
     var mapOffsetY = 0f
-    var scanVerticalRadius = 0.15f // область вертикального сканирования метрах, чтобы не захватывать горизонтальные поверхности
-    var heightOffset = 0f // повышает или понижает область вертикального сканирования в runtime
     var maxNumberOfPointsToRender = 20000f
 
     const val MinMapScale = 1f

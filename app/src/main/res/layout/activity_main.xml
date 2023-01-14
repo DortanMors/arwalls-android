@@ -41,6 +41,48 @@
       app:layout_constraintBottom_toBottomOf="parent"
       />
 
+  <LinearLayout
+      android:id="@+id/scanned_info"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      android:gravity="center_horizontal"
+      android:background="@color/dark_transparent"
+      android:paddingVertical="16dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="@id/surface_view"
+    >
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/scanned_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableStart="@drawable/ic_check"
+        android:layout_marginEnd="8dp"
+        android:textSize="18sp"
+        android:textColor="@color/green"
+        android:text="@string/scanned"
+        />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/scanned_beacon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/green"
+        android:text="@string/beacon_title"
+        />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/scanned_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/green"
+        tools:text="Cat.png"
+        />
+  </LinearLayout>
+
   <com.google.android.material.floatingactionbutton.FloatingActionButton
       android:id="@+id/settings"
       android:layout_width="wrap_content"
@@ -50,6 +92,6 @@
       android:layout_margin="16dp"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
-    />
+      android:contentDescription="@string/settings" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.ArCoreApk.InstallStatus
@@ -41,6 +42,7 @@ import ru.ssau.arwalls.common.helpers.FullScreenHelper
 import ru.ssau.arwalls.common.helpers.SnackBarUseCase
 import ru.ssau.arwalls.common.helpers.SnackBarUseCase.showSnackBar
 import ru.ssau.arwalls.common.tag
+import ru.ssau.arwalls.domain.GetCurrentBeaconFlow
 import ru.ssau.arwalls.domain.OpenGLRendererUseCase
 import ru.ssau.arwalls.rawdepth.databinding.ActivityMainBinding
 import ru.ssau.arwalls.ui.screen.settings.SettingsFragment
@@ -55,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var installRequested = false
     private val snackBarUseCase = SnackBarUseCase
+    private val getCurrentBeaconFlow = GetCurrentBeaconFlow
     private lateinit var displayRotationHelper: DisplayRotationHelper
     private lateinit var openGLRendererUseCase: OpenGLRendererUseCase
 
@@ -93,6 +96,12 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 snackBarUseCase.snackBarFlow.collect {
                     showSnackBar(it)
+                }
+            }
+            lifecycleScope.launch {
+                getCurrentBeaconFlow.invoke().collect {
+                    binding.scannedInfo.isVisible = it != null
+                    binding.scannedValue.text = it
                 }
             }
         }

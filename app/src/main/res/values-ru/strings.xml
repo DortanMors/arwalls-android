@@ -20,4 +20,7 @@
     <string name="camera_error">Камера недоступна. Перезапустите приложение.</string>
     <string name="database_error">База меток недоступна. Перезапустите приложение.</string>
     <string name="map_scale">Масштаб карты</string>
+    <string name="scanned">Распознано: </string>
+    <string name="settings">Настройки</string>
+    <string name="beacon_title">Маяк-</string>
 </resources>

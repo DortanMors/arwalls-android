@@ -2,4 +2,5 @@
 <resources>
     <color name="dark_transparent">#7f000000</color>
     <color name="light_transparent">#7fffffff</color>
+    <color name="green">#00c853</color>
 </resources>

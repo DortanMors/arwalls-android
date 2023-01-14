@@ -91,6 +91,11 @@ class OpenGLRendererUseCase(
                         ),
                     )
                 }
+                UpdateCurrentBeacon.invoke(
+                    updatedAugmentedImages.firstOrNull { img ->
+                        img.trackingMethod == AugmentedImage.TrackingMethod.FULL_TRACKING
+                    }?.name
+                )
                 MapStore.updateMapState(
                     MapState(
                         path = DrawBeaconMap(beacons),
