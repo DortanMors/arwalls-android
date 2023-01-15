@@ -28,42 +28,36 @@ import ru.ssau.arwalls.ui.model.MapState
 
 const val FloatsPerPoint = 4 // X, Y, Z, confidence
 
-fun create(frame: Frame, cameraPoseAnchor: Anchor): MapState? {
-    try {
-        val depthImage: Image = frame.acquireRawDepthImage16Bits()
-        val confidenceImage: Image = frame.acquireRawDepthConfidenceImage()
-
-        // Retrieve the intrinsic camera parameters corresponding to the depth image to
-        // transform 2D depth pixels into 3D points. See more information about the depth values
-        // at
-        // https://developers.google.com/ar/develop/java/depth/overview#understand-depth-values.
-        val intrinsics: CameraIntrinsics = frame.camera.textureIntrinsics
-        val modelMatrix = FloatArray(16)
-        cameraPoseAnchor.pose.toMatrix(modelMatrix, 0) // задание системы координат
-        val points: FloatBuffer = convertRawDepthImagesTo3dPointBuffer(
-            depthImage, confidenceImage, intrinsics, modelMatrix
-        )
-        depthImage.close()
-        confidenceImage.close()
+fun create(frame: Frame, cameraPoseAnchor: Anchor): MapState? =
+    runCatching {
+        val points: FloatBuffer = frame.acquireRawDepthImage16Bits().use { depthImage ->
+            frame.acquireRawDepthConfidenceImage().use { confidenceImage ->
+                // Retrieve the intrinsic camera parameters corresponding to the depth image to
+                // transform 2D depth pixels into 3D points. See more information about the depth values
+                // at
+                // https://developers.google.com/ar/develop/java/depth/overview#understand-depth-values.
+                val intrinsics: CameraIntrinsics = frame.camera.textureIntrinsics
+                val modelMatrix = FloatArray(16)
+                cameraPoseAnchor.pose.toMatrix(modelMatrix, 0) // задание системы координат
+                convertRawDepthImagesTo3dPointBuffer(
+                    depthImage, confidenceImage, intrinsics, modelMatrix
+                )
+            }
+        }
         val cameraY = frame.camera.displayOrientedPose.ty() - Settings.heightOffset
         when {
             cameraY < -Settings.scanVerticalRadius -> SnackBarUseCase.showMessage(R.string.hold_above)
             cameraY > Settings.scanVerticalRadius -> SnackBarUseCase.showMessage(R.string.hold_below)
             else -> SnackBarUseCase.hide(HeightWarnings)
         }
-        return MapState(
-            points,
-            MapPoint(
+        MapState(
+            points = points,
+            cameraPosition = MapPoint(
                 x = frame.camera.pose.tx(),
                 y = frame.camera.pose.tz(),
             ),
         )
-    } catch (e: NotYetAvailableException) {
-        // This normally means that depth data is not available yet.
-        // This is normal, so you don't have to spam the logcat with this.
-    }
-    return null
-}
+    }.getOrNull()
 
 /** Apply camera intrinsics to convert depth image into a 3D pointcloud.  */
 private fun convertRawDepthImagesTo3dPointBuffer(
