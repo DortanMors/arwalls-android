@@ -29,7 +29,7 @@ object Settings {
     const val MinHeightOffset = -3f
     const val MaxHeightOffset = 3f
 
-    const val MinRenderPoints = 0f
+    const val MinRenderPoints = 1f
     const val MaxRenderPoints = 50000f
 
     val NoTrackingWarnings = listOf(R.string.waiting_depth, R.string.no_tracking)
