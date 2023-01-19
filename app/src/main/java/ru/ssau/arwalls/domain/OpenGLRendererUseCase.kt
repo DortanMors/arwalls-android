@@ -45,10 +45,7 @@ class OpenGLRendererUseCase(
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
             GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f)
-
-            // Prepare the rendering objects. This involves reading shaders, so may throw an IOException.
             try {
-                // Create the texture and pass it to ARCore session to be filled during update().
                 backgroundRenderer.createOnGlThread(context)
                 depthRenderer.createOnGlThread(context)
             } catch (e: IOException) {
@@ -62,25 +59,14 @@ class OpenGLRendererUseCase(
     }
 
     override fun onDrawFrame(gl: GL10) {
-            // Clear screen to notify driver it should not load any pixels from previous frame.
             GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
-            // Notify ARCore session that the view size changed so that the perspective matrix and
-            // the video background can be properly adjusted.
             val currentSession = session ?: return
             try {
                 displayRotationHelper.updateSessionIfNeeded(currentSession)
                 currentSession.setCameraTextureName(backgroundRenderer.textureId)
-
-                // Obtain the current frame from ARSession. When the configuration is set to
-                // UpdateMode.BLOCKING (it is by default), this will throttle the rendering to the
-                // camera framerate.
                 val frame = currentSession.update()
                 val camera = frame.camera
-
-                // If frame is ready, render camera preview image to the GL surface.
                 backgroundRenderer.draw(frame)
-
-                // Retrieve the depth data for this frame.
                 val updatedAugmentedImages = frame.getUpdatedTrackables(AugmentedImage::class.java)
                 val beacons = updatedAugmentedImages.map { img ->
                     Beacon(
@@ -111,8 +97,6 @@ class OpenGLRendererUseCase(
                 depthRenderer.update(points)
                 depthRenderer.draw(camera)
                 SnackBarUseCase.hide()
-
-                // If not tracking, show tracking failure reason instead.
                 if (camera.trackingState == TrackingState.PAUSED) {
                     SnackBarUseCase.showMessage(
                         message = TrackingStateHelper.getTrackingFailureReasonString(camera)

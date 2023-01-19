@@ -34,7 +34,6 @@ class MapView @JvmOverloads constructor(
     }
 
     fun setMapState(mapState: MapState) {
-        Log.d("HARDCODE", "setMapState")
         if (width <= 0) {
             return
         }
@@ -52,7 +51,6 @@ class MapView @JvmOverloads constructor(
         if (Settings.markerVisibility) {
             canvas.drawMarker(cameraPosition, Settings.markerSize, markerPaint)
         }
-        Log.d("HARDCODE", "onDraw")
     }
 
     companion object {
