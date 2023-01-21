@@ -38,4 +38,5 @@
   <string name="hold_below">Hold below</string>
   <string name="no_tracking">No tracking</string>
   <string name="empty" translatable="false" />
+  <string name="settings">Settings</string>
 </resources>

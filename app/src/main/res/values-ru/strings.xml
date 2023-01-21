@@ -21,4 +21,5 @@
     <string name="hold_above">Держите выше</string>
     <string name="hold_below">Держите ниже</string>
     <string name="no_tracking">Отслеживание приостановлено</string>
+    <string name="settings">Настройки</string>
 </resources>
