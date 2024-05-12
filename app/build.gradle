@@ -9,7 +9,7 @@ android {
         // AR Optional apps must declare minSdkVersion >= 14.
         // AR Required apps must declare minSdkVersion >= 24.
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
         def majorVersionCode = 0
         def minorVersionCode = 1
         versionCode majorVersionCode * 100000 + minorVersionCode * 1000 + generateVersionCode()
