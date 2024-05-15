@@ -92,7 +92,7 @@ class MapFragment: Fragment() {
         }
     }
 
-    private fun saveImageToGallery() {
+    private suspend fun saveImageToGallery() {
         val bitmap = RawMapStore.getBitmap()
 
         val filename = "${UUID.randomUUID()}.jpg"
