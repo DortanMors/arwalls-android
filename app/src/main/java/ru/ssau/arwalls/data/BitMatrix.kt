@@ -1,19 +1,31 @@
 package ru.ssau.arwalls.data
 
-import java.util.LinkedList
-
 typealias Coordinate = Int
 
-class BitMatrix {
-    private val _filledPoints: MutableList<Pair<Coordinate, Coordinate>> = LinkedList()
+class BitMatrix(val rows: Int = 5000, val columns: Int = 5000) {
+
+    private val _filledPoints = Array(rows) {
+        BooleanArray(columns)
+    }
+
+    val centerOffsetX: Int = columns / 2
+    val centerOffsetY: Int = rows / 2
+
     val filledPoints: List<Pair<Coordinate, Coordinate>>
-        get() = _filledPoints
+        get() = _filledPoints.flatMapIndexed { y, row ->
+            row.mapIndexed { x, point ->
+                (x to y).takeIf { point }
+            }
+        }.filterNotNull()
 
     fun set(x: Coordinate, y: Coordinate) {
-        _filledPoints += x to y
+        val centeredX = x + centerOffsetX
+        val centeredY = y + centerOffsetY
+        if (centeredX < columns && centeredY < rows)
+        _filledPoints[centeredY][centeredX] = true
     }
 
     fun remove(x: Coordinate, y: Coordinate) {
-        _filledPoints.removeAll { (xPoint, yPoint) -> x == xPoint && y == yPoint }
+        _filledPoints[y][x] = false
     }
 }
