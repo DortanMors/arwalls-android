@@ -2,6 +2,7 @@ package ru.ssau.arwalls.data
 
 import android.util.Log
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -11,13 +12,14 @@ import kotlinx.coroutines.launch
 import ru.ssau.arwalls.common.tag
 import ru.ssau.arwalls.ui.model.MapState
 
-object MapStore {
+object PartialMapStore {
     private val mutableMapPointsState = MutableStateFlow(MapState())
     val newMapPointsState: Flow<MapState> = mutableMapPointsState
 
     private val coroutineScope = CoroutineScope(
         Dispatchers.Default +
             Job() +
+            CoroutineName("PartialMapStore") +
             CoroutineExceptionHandler { _, throwable -> Log.e(tag, throwable.toString()) }
     )
 

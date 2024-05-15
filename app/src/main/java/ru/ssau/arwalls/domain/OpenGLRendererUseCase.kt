@@ -7,6 +7,13 @@ import android.util.Log
 import com.google.ar.core.AugmentedImage
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
+import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
+import ru.ssau.arwalls.common.helpers.SnackBarUseCase
+import ru.ssau.arwalls.common.rendering.BackgroundRenderer
+import ru.ssau.arwalls.common.rendering.DepthRenderer
+import ru.ssau.arwalls.common.tag
+import ru.ssau.arwalls.data.PartialMapStore
+import ru.ssau.arwalls.rawdepth.create
 import java.io.IOException
 import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
@@ -15,18 +22,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import ru.ssau.arwalls.common.helpers.DisplayRotationHelper
-import ru.ssau.arwalls.common.helpers.SnackBarUseCase
-import ru.ssau.arwalls.common.helpers.TrackingStateHelper
-import ru.ssau.arwalls.common.rendering.BackgroundRenderer
-import ru.ssau.arwalls.common.rendering.DepthRenderer
-import ru.ssau.arwalls.common.tag
-import ru.ssau.arwalls.data.Beacon
-import ru.ssau.arwalls.data.MapPoint
-import ru.ssau.arwalls.data.MapStore
-import ru.ssau.arwalls.rawdepth.create
-import ru.ssau.arwalls.ui.model.MapState
-
+import ru.ssau.arwalls.data.RawMapStore
 
 class OpenGLRendererUseCase(
     private val context: Context,
@@ -103,6 +99,8 @@ class OpenGLRendererUseCase(
                     )
                     return
                 }
+                PartialMapStore.updateMapState(mapState)
+                RawMapStore.updateMapStateAsync(mapState)
             } catch (t: Throwable) {
                 Log.e(tag, "Exception on the OpenGL thread", t)
             }
