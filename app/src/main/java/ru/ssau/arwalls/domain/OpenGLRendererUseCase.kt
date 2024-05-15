@@ -11,7 +11,7 @@ import ru.ssau.arwalls.common.helpers.SnackBarUseCase
 import ru.ssau.arwalls.common.rendering.BackgroundRenderer
 import ru.ssau.arwalls.common.rendering.DepthRenderer
 import ru.ssau.arwalls.common.tag
-import ru.ssau.arwalls.data.MapStore
+import ru.ssau.arwalls.data.PartialMapStore
 import ru.ssau.arwalls.rawdepth.create
 import java.io.IOException
 import java.nio.FloatBuffer
@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import ru.ssau.arwalls.common.Settings.NoTrackingWarnings
+import ru.ssau.arwalls.data.RawMapStore
 import ru.ssau.arwalls.rawdepth.R
 
 class OpenGLRendererUseCase(
@@ -93,7 +94,8 @@ class OpenGLRendererUseCase(
                     )
                     return
                 }
-                MapStore.updateMapState(mapState)
+                PartialMapStore.updateMapState(mapState)
+                RawMapStore.updateMapStateAsync(mapState)
             } catch (t: Throwable) {
                 Log.e(tag, "Exception on the OpenGL thread", t)
             }
