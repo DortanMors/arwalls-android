@@ -21,11 +21,16 @@ class BitMatrix(val rows: Int = 5000, val columns: Int = 5000) {
     fun set(x: Coordinate, y: Coordinate) {
         val centeredX = x + centerOffsetX
         val centeredY = y + centerOffsetY
-        if (centeredX < columns && centeredY < rows)
-        _filledPoints[centeredY][centeredX] = true
+        if (centeredX < columns && centeredY < rows) {
+            _filledPoints[centeredY][centeredX] = true
+        }
     }
 
     fun remove(x: Coordinate, y: Coordinate) {
-        _filledPoints[y][x] = false
+        val centeredX = x + centerOffsetX
+        val centeredY = y + centerOffsetY
+        if (centeredX < columns && centeredY < rows) {
+            _filledPoints[centeredY][centeredX] = false
+        }
     }
 }
