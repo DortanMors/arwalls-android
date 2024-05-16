@@ -1,24 +1,24 @@
 package ru.ssau.arwalls.map
 
 import android.Manifest
-import android.content.ContentValues
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import ru.ssau.arwalls.data.BitmapSaver.saveBitmapToGallery
 import ru.ssau.arwalls.data.RawMapStore
+import ru.ssau.arwalls.rawdepth.R
 import ru.ssau.arwalls.rawdepth.databinding.FragmentMapBinding
 import java.util.UUID
 
@@ -43,25 +43,14 @@ class MapFragment: Fragment() {
         }
         binding.saveMap.setOnClickListener {
             lifecycleScope.launch {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (hasPermissions()) {
-                        Log.i("HARDCODE", "has permissions")
-//                    saveImageToGallery()
-                    } else {
-                        Log.i("HARDCODE", "has no permissions")
-//                    requestPermissions()
-                    }
-                    saveImageToGallery()
-                } else {
-                    saveImageToGallery()
-                }
+                saveImageToGallery()
             }
         }
         lifecycleScope.launchWhenResumed {
             Log.d("HARDCODE", "launchWhenResumed")
             lifecycleScope.launch {
                 viewModel.newMapPointsState.collect {
-                    Log.d("HARDCODE", "collect")
+//                    Log.d("HARDCODE", "collect")
                     binding.map.setMapState(it)
                 }
             }
@@ -93,26 +82,21 @@ class MapFragment: Fragment() {
     }
 
     private suspend fun saveImageToGallery() {
-        val bitmap = RawMapStore.getBitmap()
-
-        val filename = "${UUID.randomUUID()}.jpg"
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
-            }
+        binding.saveMap.isEnabled = false
+        withContext(Dispatchers.IO) {
+            Log.i("HARDOCDE", "Map creating....")
+            val bitmap = RawMapStore.getBitmap()
+            Log.i("HARDOCDE", "Map bitmap created")
+            saveBitmapToGallery(
+                requireContext(), bitmap, UUID.randomUUID().toString()
+            )
+            Log.i("HARDOCDE", "Map image saved")
         }
-
-        val contentResolver = requireActivity().contentResolver
-        val uri = requireActivity().contentResolver.insert(
-            /* url = */ MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            /* values = */ contentValues,
-        )
-        uri?.let {
-            contentResolver.openOutputStream(it)?.use { outputStream ->
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-            } ?: Log.w(javaClass.simpleName, "outputStream не получен")
-        } ?: Log.w(javaClass.simpleName, "uri не получен")
+        withContext(Dispatchers.Main) {
+            requireActivity().runOnUiThread {
+                Toast.makeText(requireContext(), getString(R.string.saved), Toast.LENGTH_SHORT).show()
+            }
+            binding.saveMap.isEnabled = true
+        }
     }
 }

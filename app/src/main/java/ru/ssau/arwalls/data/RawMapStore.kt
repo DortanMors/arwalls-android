@@ -33,14 +33,12 @@ object RawMapStore {
         coroutineScope.launch {
             val pointsArray = mapState.points.array()
             with(rawMatrix) {
-                mutex.withLock {
-                    for (i in pointsArray.indices step FloatsPerPoint) {
-                        if (pointsArray[i + 1] - Settings.heightOffset in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
-                            set(
-                                x = (pointsArray[i] * mapScale).toInt(),     // X
-                                y = (pointsArray[i + 2] * mapScale).toInt(), // Z
-                            )
-                        }
+                for (i in pointsArray.indices step FloatsPerPoint) {
+                    if (pointsArray[i + 1] - Settings.heightOffset in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
+                        set(
+                            x = (pointsArray[i] * mapScale).toInt(),     // X
+                            y = (pointsArray[i + 2] * mapScale).toInt(), // Z
+                        )
                     }
                 }
             }
@@ -49,9 +47,7 @@ object RawMapStore {
 
     suspend fun getBitmap(): Bitmap =
         with(rawMatrix) {
-            val points = mutex.withLock {
-                filledPoints.toMutableList().toList()
-            }
+            val points = filledPoints.toMutableList().toList()
             val maxX = points.maxOf { (x, _) -> x }
             val minX = points.minOf { (x, _) -> x }
             val maxY = points.maxOf { (_, y) -> y }
@@ -62,7 +58,7 @@ object RawMapStore {
             val height = maxY - minY + 1
             Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565).apply {
                 points.forEach { (x, y) ->
-                    setPixel(x + offsetX, y + offsetY, Color.BLACK)
+                    setPixel(x + offsetX, y + offsetY, Color.RED)
                 }
             }
         }
