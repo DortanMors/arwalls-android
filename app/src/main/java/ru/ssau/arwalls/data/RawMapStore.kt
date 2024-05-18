@@ -48,10 +48,23 @@ object RawMapStore {
     suspend fun getBitmap(): Bitmap =
         with(rawMatrix) {
             val points = filledPoints.toMutableList().toList()
-            val maxX = points.maxOf { (x, _) -> x }
-            val minX = points.minOf { (x, _) -> x }
-            val maxY = points.maxOf { (_, y) -> y }
-            val minY = points.minOf { (_, y) -> y }
+
+            var maxX = Int.MIN_VALUE
+            var minX = Int.MAX_VALUE
+            var maxY = Int.MIN_VALUE
+            var minY = Int.MAX_VALUE
+
+            points.forEach { (x, y) ->
+                when {
+                    x > maxX -> maxX = x
+                    x < minX -> minX = x
+                }
+                when {
+                    y > maxY -> maxY = y
+                    y < minY -> minY = y
+                }
+            }
+
             val offsetX = 0 - minX
             val offsetY = 0 - minY
             val width = maxX - minX + 1
