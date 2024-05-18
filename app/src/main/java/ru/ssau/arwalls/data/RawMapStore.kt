@@ -57,8 +57,9 @@ object RawMapStore {
             val width = maxX - minX + 1
             val height = maxY - minY + 1
             Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565).apply {
+                eraseColor(Color.WHITE)
                 points.forEach { (x, y) ->
-                    setPixel(x + offsetX, y + offsetY, Color.RED)
+                    setPixel(x + offsetX, y + offsetY, Color.BLACK)
                 }
             }
         }
