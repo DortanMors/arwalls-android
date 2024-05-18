@@ -2,7 +2,9 @@
 <resources>
     <string name="redraw_map">Перерисовать карту</string>
     <string name="centralize">Центрировать координаты</string>
+    <string name="save_map">Сохранить карту</string>
     <string name="save">OK</string>
+    <string name="saved">Карта сохранена в галерею</string>
     <string name="accuracy">Точность</string>
     <string name="marker_visibility">Показать маркер</string>
     <string name="vertical_radius">Длина вертикали обзора</string>
