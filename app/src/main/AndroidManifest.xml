@@ -29,7 +29,7 @@
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="false"
       android:largeHeap="true"
-      android:dataExtractionRules="@xml/data_extraction_rules">
+      >
 
     <activity
         android:name="ru.ssau.arwalls.rawdepth.MainActivity"

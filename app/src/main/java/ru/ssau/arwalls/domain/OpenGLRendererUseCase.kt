@@ -22,7 +22,11 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import ru.ssau.arwalls.common.helpers.TrackingStateHelper
+import ru.ssau.arwalls.data.Beacon
+import ru.ssau.arwalls.data.MapPoint
 import ru.ssau.arwalls.data.RawMapStore
+import ru.ssau.arwalls.ui.model.MapState
 
 class OpenGLRendererUseCase(
     private val context: Context,
@@ -78,13 +82,11 @@ class OpenGLRendererUseCase(
                         img.trackingMethod == AugmentedImage.TrackingMethod.FULL_TRACKING
                     }?.name
                 )
-                MapStore.updateMapState(
-                    MapState(
-                        path = DrawBeaconMap(beacons),
-                        cameraPosition = MapPoint(
-                            x = frame.camera.pose.tx(),
-                            y = frame.camera.pose.tz(),
-                        )
+                val mapState = MapState(
+                    path = DrawBeaconMap(beacons),
+                    cameraPosition = MapPoint(
+                        x = frame.camera.pose.tx(),
+                        y = frame.camera.pose.tz(),
                     )
                 )
                 val points: FloatBuffer = frame.create(
