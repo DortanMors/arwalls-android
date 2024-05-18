@@ -8,8 +8,8 @@ class BitMatrix(val rows: Int = 5000, val columns: Int = 5000) {
         BooleanArray(columns)
     }
 
-    val centerOffsetX: Int = columns / 2
-    val centerOffsetY: Int = rows / 2
+    val centerOffsetX: Coordinate = columns / 2
+    val centerOffsetY: Coordinate = rows / 2
 
     val filledPoints: List<Pair<Coordinate, Coordinate>>
         get() = _filledPoints.flatMapIndexed { y, row ->
