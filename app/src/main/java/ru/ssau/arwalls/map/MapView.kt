@@ -50,11 +50,15 @@ class MapView @JvmOverloads constructor(
         try {
             for (i in pointsArray.indices step FloatsPerPoint) {
                 if (pointsArray[i + 1] - Settings.heightOffset in -Settings.scanVerticalRadius..Settings.scanVerticalRadius) { // Y
-                    bitmap.setPixel(
-                        (pointsArray[i] * Settings.mapScale + Settings.mapOffsetX).toInt(),     // X
-                        (pointsArray[i + 2] * Settings.mapScale + Settings.mapOffsetY).toInt(), // Z
-                        Settings.paintColor,
-                    )
+                    val bitmapX = (pointsArray[i] * Settings.mapScale + Settings.mapOffsetX).toInt()
+                    val bitmapY = (pointsArray[i + 2] * Settings.mapScale + Settings.mapOffsetY).toInt()
+                    if (bitmapX > 0 && bitmapY > 0 && bitmapX < width && bitmapY < height) {
+                        bitmap.setPixel(
+                            bitmapX, // X
+                            bitmapY, // Z
+                            Settings.paintColor,
+                        )
+                    }
                 }
             }
         }

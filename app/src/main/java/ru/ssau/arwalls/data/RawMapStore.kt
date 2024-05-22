@@ -86,7 +86,11 @@ object RawMapStore {
             Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565).apply {
                 eraseColor(Color.WHITE)
                 points.forEach { (x, y) ->
-                    setPixel(x + offsetX, y + offsetY, Color.BLACK)
+                    val bitmapX = x + offsetX
+                    val bitmapY = y + offsetY
+                    if (bitmapX > 0 && bitmapY > 0 && bitmapX < width && bitmapY < height) {
+                        setPixel(bitmapX, bitmapY, Color.BLACK)
+                    }
                 }
             }
         }

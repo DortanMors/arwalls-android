@@ -11,7 +11,7 @@ import java.io.IOException
 
 object BitmapSaver {
 
-    fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String) {
+    fun saveBitmapToGallery(context: Context, bitmap: Bitmap, title: String): Boolean {
         val contentResolver: ContentResolver = context.contentResolver
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, title)
@@ -25,14 +25,14 @@ object BitmapSaver {
 
         imageUri?.let {
             try {
-                contentResolver.openOutputStream(it).use { outputStream ->
-                    if (outputStream != null) {
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                    }
+                contentResolver.openOutputStream(it)?.use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    return true
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
+        return false
     }
 }
