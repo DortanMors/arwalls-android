@@ -18,7 +18,9 @@
   <string name="app_name" translatable="false">Arwalls bread</string>
   <string name="redraw_map">Redraw map</string>
   <string name="centralize">Centralize</string>
+  <string name="save_map">Save map</string>
   <string name="save">OK</string>
+  <string name="saved">Map saved successfully</string>
   <string name="accuracy">Accuracy</string>
   <string name="marker_visibility">Marker visibility</string>
   <string name="vertical_radius">Vertical radius</string>
