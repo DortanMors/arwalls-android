@@ -1,18 +1,16 @@
 package ru.ssau.arwalls.map
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,46 +35,22 @@ class MapFragment: Fragment() {
             binding.map.centralize()
         }
         binding.redrawMap.setOnClickListener {
-            RawMapStore.clear()
-            binding.map.clear()
-            binding.map.centralize()
+            lifecycleScope.launch {
+                RawMapStore.clear()
+                binding.map.clear()
+                binding.map.centralize()
+            }
         }
         binding.saveMap.setOnClickListener {
             lifecycleScope.launch {
                 saveImageToGallery()
             }
         }
-        lifecycleScope.launchWhenResumed {
-            Log.d("HARDCODE", "launchWhenResumed")
-            lifecycleScope.launch {
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.newMapPointsState.collect {
-//                    Log.d("HARDCODE", "collect")
                     binding.map.setMapState(it)
                 }
-            }
-        }
-    }
-
-    private fun hasPermissions(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            /* context = */ requireContext(),
-            /* permission = */ Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestPermissions() {
-        ActivityCompat.requestPermissions(
-            /* activity = */ requireActivity(),
-            /* permissions = */ arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-            /* requestCode = */ 1,
-        )
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            lifecycleScope.launch {
-                saveImageToGallery()
             }
         }
     }

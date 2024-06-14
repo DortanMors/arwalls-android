@@ -17,10 +17,6 @@ import java.io.IOException
 import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import ru.ssau.arwalls.common.Settings.NoTrackingWarnings
 import ru.ssau.arwalls.data.RawMapStore
 import ru.ssau.arwalls.rawdepth.R
@@ -33,12 +29,6 @@ class OpenGLRendererUseCase(
     private val backgroundRenderer = BackgroundRenderer()
     private val depthRenderer = DepthRenderer()
     var session: Session? = null
-
-    private val coroutineScope = CoroutineScope(
-        Dispatchers.Default +
-            Job() +
-            CoroutineExceptionHandler { _, throwable -> Log.e(tag, throwable.toString()) }
-    )
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
             GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f)
